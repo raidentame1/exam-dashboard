@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mock Exam Dashboard</title>
+<style>
+  :root{
+    --bg:#0a0e14; --card:#131a24; --card2:#1a2330; --card3:#212c3b; --border:#2a3444;
+    --text:#f0f4f9; --dim:#a9b4c4; --dim2:#79869a;
+    --accent:#4ade80; --accent-dim:rgba(74,222,128,.14);
+    --lit:#f472b6; --phy:#5eb0ff; --met:#fbbf24; --spe:#b794f6; --pe:#22d3ee; --mus:#fb923c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding:32px 24px 60px;
+  }
+  .wrap{max-width:1180px; margin:0 auto;}
+  .navbar{display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; flex-wrap:wrap; gap:10px;}
+  .brand{display:flex; align-items:center; gap:9px; font-weight:800; font-size:15px; letter-spacing:-.01em;}
+  .brand .sq{width:9px; height:9px; border-radius:3px; background:var(--accent); box-shadow:0 0 10px rgba(74,222,128,.6);}
+  .navlinks{display:flex; gap:6px; background:var(--card); border:1px solid var(--border); border-radius:11px; padding:4px;}
+  .navlinks a{color:var(--dim); text-decoration:none; font-size:12.5px; font-weight:600; padding:8px 14px; border-radius:8px; transition:background .15s, color .15s;}
+  .navlinks a:hover{color:var(--text); background:var(--card2);}
+  .navlinks a.active{color:var(--bg); background:var(--accent);}
+  .topbar{display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:12px; margin-bottom:24px;}
+  .topbar h1{font-size:22px; font-weight:700; margin:0 0 4px; letter-spacing:-.01em;}
+  .topbar .sub{color:var(--dim); font-size:13px;}
+  .pill{
+    background:var(--accent-dim); color:var(--accent); border:1px solid rgba(74,222,128,.35);
+    padding:8px 16px; border-radius:999px; font-size:13px; font-weight:700; white-space:nowrap;
+    transition:transform .2s;
+  }
+  .kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px;}
+  .kpi{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px 18px; transition:border-color .2s, transform .2s;}
+  .kpi:hover{border-color:var(--dim2); transform:translateY(-2px);}
+  .kpi .lbl{color:var(--dim); font-size:12px; margin-bottom:8px; font-weight:500;}
+  .kpi .val{font-size:27px; font-weight:800; letter-spacing:-.02em;}
+  .kpi .val span{font-size:14px; color:var(--dim); font-weight:500;}
+  .grid2{display:grid; grid-template-columns:1.4fr 1fr; gap:14px; margin-bottom:20px;}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; transition:box-shadow .3s, border-color .3s;}
+  .card.complete{border-color:rgba(74,222,128,.5); box-shadow:0 0 0 1px rgba(74,222,128,.15), 0 0 28px rgba(74,222,128,.12);}
+  .card h2{font-size:14px; font-weight:700; margin:0 0 14px; color:var(--text); display:flex; align-items:center; justify-content:space-between;}
+  .card h2 .muted{color:var(--dim); font-weight:500; font-size:12px;}
+  .celebrate{display:none; align-items:center; gap:8px; background:var(--accent-dim); color:var(--accent); border:1px solid rgba(74,222,128,.35); border-radius:10px; padding:9px 12px; font-size:12.5px; font-weight:600; margin-bottom:14px; animation:slideIn .35s ease;}
+  .celebrate.show{display:flex;}
+  @keyframes slideIn{from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:translateY(0);}}
+  .badge{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700; margin:0 6px 12px 0;}
+  .dot{width:8px; height:8px; border-radius:50%; display:inline-block;}
+  .topic-text{color:var(--dim); font-size:13px; margin-bottom:16px; line-height:1.6;}
+  .video-links{font-size:11.5px; line-height:1.7; color:var(--dim); margin:4px 0 2px;}
+  .video-links .vlabel{font-weight:700; color:var(--dim2); text-transform:uppercase; letter-spacing:.03em; font-size:10px;}
+  .video-links a{color:var(--accent); text-decoration:none;}
+  .video-links a:hover{text-decoration:underline;}
+  .sess-head{display:flex; align-items:center; gap:8px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--dim2); margin:16px 0 8px;}
+  .sess-head:first-child{margin-top:0;}
+  .sess-head .line{flex:1; height:1px; background:var(--border);}
+  .sess-head.retrieval{color:var(--accent);}
+  .sess-head.retrieval:before{content:"↻"; font-size:13px;}
+  .checklist{display:flex; flex-direction:column; gap:8px;}
+  .item{display:flex; align-items:center; gap:10px; padding:11px 12px; background:var(--card2); border-radius:10px; cursor:pointer; border:1px solid transparent; transition:border-color .15s, background .15s, transform .1s;}
+  .item:hover{border-color:var(--dim2); background:var(--card3);}
+  .item:active{transform:scale(.98);}
+  .item.retrieval{background:rgba(74,222,128,.05); border-color:rgba(74,222,128,.15);}
+  .item .box{width:19px; height:19px; border-radius:6px; border:2px solid var(--dim2); flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:background .2s, border-color .2s;}
+  .item.done .box{background:var(--accent); border-color:var(--accent);}
+  .item.done .box:after{content:"✓"; font-size:12px; color:#08130d; font-weight:800;}
+  .box.pop{animation:popCheck .32s cubic-bezier(.34,1.56,.64,1);}
+  @keyframes popCheck{0%{transform:scale(.55) rotate(-8deg);}55%{transform:scale(1.22) rotate(4deg);}100%{transform:scale(1) rotate(0);}}
+  .item .lab{font-size:13.5px; line-height:1.4;}
+  .item.done .lab{color:var(--dim); text-decoration:line-through;}
+  .item .grp{font-size:10.5px; color:var(--dim); margin-left:auto; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; padding-left:10px;}
+  .rings{display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;}
+  .ring-item{display:flex; flex-direction:column; align-items:center; gap:8px; opacity:0; transform:scale(.85); animation:ringIn .5s cubic-bezier(.22,1,.36,1) forwards;}
+  @keyframes ringIn{to{opacity:1; transform:scale(1);}}
+  .ring{width:66px; height:66px; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative;}
+  .ring .hole{width:48px; height:48px; border-radius:50%; background:var(--card); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;}
+  .ring-name{font-size:11px; color:var(--dim); text-align:center; line-height:1.3;}
+  .cal{margin-top:4px;}
+  .cal-row{display:grid; grid-template-columns:44px repeat(7,1fr); gap:5px; align-items:center; margin-bottom:5px;}
+  .cal-head{font-size:10.5px; color:var(--dim); text-align:center; font-weight:600;}
+  .cal-wk-label{font-size:10.5px; color:var(--dim);}
+  .cal-cell{
+    aspect-ratio:1; border-radius:6px; background:var(--card2); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--dim2); position:relative;
+    transition:transform .15s;
+  }
+  .cal-cell:not(.faded):hover{transform:scale(1.12); z-index:2;}
+  .cal-cell.faded{opacity:.3;}
+  .subjects{display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-bottom:20px;}
+  .subj-card{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; border-left:3px solid var(--c); transition:transform .15s, border-color .15s;}
+  .subj-card:hover{transform:translateY(-2px); border-color:var(--dim2);}
+  .subj-card .name{font-size:12.5px; font-weight:700; margin-bottom:6px;}
+  .subj-card .meta{font-size:11px; color:var(--dim); line-height:1.5;}
+  .legend{display:flex; flex-wrap:wrap; gap:12px; margin-top:14px; font-size:11px; color:var(--dim);}
+  .legend span{display:inline-flex; align-items:center; gap:5px;}
+  footer{color:var(--dim2); font-size:12px; text-align:center; margin-top:28px; line-height:1.6;}
+
+  /* Syllabus progress accordion */
+  .syllabus{display:flex; flex-direction:column; gap:9px;}
+  .subj-row{background:var(--card2); border:1px solid var(--border); border-radius:11px; overflow:hidden; transition:border-color .2s;}
+  .subj-row:hover{border-color:var(--dim2);}
+  .subj-row-head{display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer; user-select:none;}
+  .subj-row .chev{transition:transform .25s; color:var(--dim); font-size:10px; flex-shrink:0;}
+  .subj-row.open .chev{transform:rotate(90deg);}
+  .subj-row-head .name2{font-weight:700; font-size:13px; flex:0 0 165px;}
+  .bar-track{flex:1; height:9px; background:var(--border); border-radius:99px; overflow:hidden;}
+  .bar-fill{height:100%; border-radius:99px; width:0; transition:width .8s cubic-bezier(.22,1,.36,1);}
+  .subj-row-head .pct{font-size:12.5px; font-weight:800; width:42px; text-align:right; flex-shrink:0;}
+  .subj-row-body{max-height:0; overflow:hidden; transition:max-height .35s ease;}
+  .subj-row.open .subj-row-body{max-height:1200px;}
+  .unit-block{padding:2px 14px 12px 40px;}
+  .unit-head{font-size:11px; font-weight:700; color:var(--dim); margin:12px 0 7px; text-transform:uppercase; letter-spacing:.03em;}
+  .unit-block .unit-block-bar{display:flex; align-items:center; gap:10px; margin-bottom:2px;}
+  .unit-block .unit-block-bar .bar-track{height:7px;}
+  .unit-block .unit-block-bar .pct{font-size:11px; color:var(--dim); width:34px; text-align:right;}
+  .topic-row{display:flex; align-items:center; gap:10px; padding:6px 0 6px 14px; font-size:12.5px;}
+  .topic-row .tname{flex:1; color:var(--text); line-height:1.4;}
+  .topic-row .bar-track{height:6px; flex:0 0 90px;}
+  .topic-row .pct{width:32px; font-size:11px; color:var(--dim); text-align:right;}
+  footer{color:var(--dim2);}
+  @media(max-width:820px){ .kpis{grid-template-columns:repeat(2,1fr);} .grid2{grid-template-columns:1fr;} .subjects{grid-template-columns:repeat(3,1fr);} .rings{grid-template-columns:repeat(3,1fr);}
+    .subj-row-head .name2{flex-basis:110px; font-size:12px;} .topic-row .bar-track{flex-basis:60px;} }
+  @media(max-width:520px){ .subjects{grid-template-columns:repeat(2,1fr);} .cal-row{grid-template-columns:30px repeat(7,1fr);} }
+
+  /* Streak, milestones & toasts */
+  .kpi-sub{font-size:10.5px; color:var(--dim2); margin-top:5px; font-weight:600; min-height:13px;}
+  .kpi.streak-hot{border-color:rgba(251,146,60,.5); box-shadow:0 0 0 1px rgba(251,146,60,.15), 0 0 24px rgba(251,146,60,.14);}
+  .kpi.streak-hot .val{color:#fb923c;}
+  .streak-risk{display:none; align-items:center; gap:9px; background:rgba(251,146,60,.1); color:#fb923c; border:1px solid rgba(251,146,60,.35); border-radius:10px; padding:10px 14px; font-size:12.5px; font-weight:600; margin-bottom:16px; animation:slideIn .35s ease;}
+  .streak-risk.show{display:flex;}
+  .streak-risk .flame{font-size:15px; flex-shrink:0;}
+  .toast-stack{position:fixed; bottom:20px; right:20px; display:flex; flex-direction:column; gap:10px; z-index:999; max-width:320px; pointer-events:none;}
+  .toast{background:var(--card); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:12px; padding:13px 16px; box-shadow:0 10px 32px rgba(0,0,0,.4); animation:toastIn .4s cubic-bezier(.22,1,.36,1); pointer-events:auto;}
+  .toast .t-title{font-weight:800; font-size:13px; margin-bottom:3px;}
+  .toast .t-body{color:var(--dim); font-size:11.5px; line-height:1.4;}
+  @keyframes toastIn{from{opacity:0; transform:translateX(30px) scale(.95);} to{opacity:1; transform:translateX(0) scale(1);}}
+  .toast.out{animation:toastOut .3s ease forwards;}
+  @keyframes toastOut{to{opacity:0; transform:translateX(30px) scale(.95);}}
+
+  /* Final countdown panel */
+  .countdown-days{display:flex; gap:10px; overflow-x:auto; padding-bottom:8px; margin-bottom:6px; -webkit-overflow-scrolling:touch;}
+  .day-chip{flex:0 0 130px; background:var(--card2); border:1px solid var(--border); border-radius:12px; padding:12px 12px 11px; transition:border-color .15s, transform .15s;}
+  .day-chip:hover{border-color:var(--dim2); transform:translateY(-2px);}
+  .day-chip.is-today{border-color:var(--accent); box-shadow:0 0 0 1px rgba(74,222,128,.25);}
+  .day-chip.is-mock{border-color:#fb923c; box-shadow:0 0 0 1px rgba(251,146,60,.25); background:rgba(251,146,60,.06);}
+  .day-chip .dc-date{font-size:11.5px; font-weight:700; color:var(--dim);}
+  .day-chip .dc-date strong{color:var(--text);}
+  .day-chip .dc-phase{font-size:10px; color:var(--dim2); margin:3px 0 9px; text-transform:uppercase; letter-spacing:.03em; line-height:1.35; min-height:27px;}
+  .day-chip .dc-badges{display:flex; flex-wrap:wrap; gap:4px;}
+  .day-chip .dc-badge{font-size:10px; font-weight:700; padding:2px 7px; border-radius:999px; white-space:nowrap;}
+  .cd-sectitle{font-size:12px; font-weight:700; margin:20px 0 10px; color:var(--dim); text-transform:uppercase; letter-spacing:.03em;}
+  .freq-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+  .freq-col{background:var(--card2); border:1px solid var(--border); border-radius:12px; padding:14px;}
+  .freq-col h3{font-size:12.5px; margin:0 0 11px; font-weight:700;}
+  .freq-item{margin-bottom:9px;}
+  .freq-item:last-child{margin-bottom:0;}
+  .freq-item .fi-top{display:flex; justify-content:space-between; gap:8px; font-size:11.5px; margin-bottom:4px;}
+  .freq-item .fi-top .fi-name{color:var(--text); line-height:1.35;}
+  .freq-item .fi-top .fi-pct{color:var(--dim); font-weight:700; flex-shrink:0;}
+  .freq-bar-track{height:6px; background:var(--border); border-radius:99px; overflow:hidden;}
+  .freq-bar-fill{height:100%; border-radius:99px;}
+  .freq-note{grid-column:1/-1; font-size:11.5px; color:var(--dim); line-height:1.6; background:var(--card2); border:1px solid var(--border); border-radius:10px; padding:11px 13px;}
+  .freq-source{grid-column:1/-1; font-size:10.5px; color:var(--dim2); line-height:1.5;}
+  @media(max-width:820px){ .freq-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="toast-stack" id="toastStack"></div>
+
+  <div class="navbar">
+    <div class="brand"><span class="sq"></span>Mock exam prep</div>
+    <div class="navlinks">
+      <a href="index.html" class="active">Dashboard</a>
+      <a href="https://mock-exam-tracker-raidentame1-3207s-projects.vercel.app/">Tracker</a>
+      <a href="https://mock-exam-planner-raidentame1-3207s-projects.vercel.app/">Planner</a>
+    </div>
+  </div>
+
+  <div class="topbar">
+    <div>
+      <h1>Mock exam dashboard</h1>
+      <div class="sub" id="todayLine">-</div>
+    </div>
+    <div class="pill" id="countdownPill">-</div>
+  </div>
+
+  <div class="streak-risk" id="streakRisk"><span class="flame">&#128293;</span><span><strong id="streakRiskDays">0</strong>-day streak &mdash; finish today's checklist before midnight to keep it alive.</span></div>
+
+  <div class="card" style="margin-bottom:20px;" id="countdownCard">
+    <h2>Final countdown <span class="muted" id="countdownSub">-</span></h2>
+    <div class="countdown-days" id="countdownDays"></div>
+    <div class="cd-sectitle">Most exam-frequent topics still to nail</div>
+    <div class="freq-grid" id="freqGrid"></div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="lbl">Days until mocks</div><div class="val" id="kpiDays">-</div></div>
+    <div class="kpi"><div class="lbl">Overall completion</div><div class="val" id="kpiOverall">-</div></div>
+    <div class="kpi" id="streakKpi"><div class="lbl">Study streak</div><div class="val" id="kpiStreak">-</div><div class="kpi-sub" id="kpiStreakBest"></div></div>
+    <div class="kpi"><div class="lbl">Dot-points tracked</div><div class="val">417 <span>see Tracker tab</span></div></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card" id="todayCard">
+      <h2>Today's focus <span class="muted" id="phaseLabel"></span></h2>
+      <div class="celebrate" id="celebrate">All sessions ticked off for today &mdash; nice work.</div>
+      <div id="todayBadges"></div>
+      <div class="topic-text" id="todayTopic"></div>
+      <div class="checklist" id="todayChecklist"></div>
+    </div>
+    <div class="card">
+      <h2>This week by subject</h2>
+      <div class="rings" id="ringsGrid"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px;">
+    <h2>Syllabus progress <span class="muted">overall, since 19 Aug</span></h2>
+    <div class="syllabus" id="syllabusGrid"></div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px;">
+    <h2>Prep calendar <span class="muted">19 Aug &ndash; 17 Sep</span></h2>
+    <div class="cal" id="calGrid"></div>
+    <div class="legend" id="calLegend"></div>
+  </div>
+
+  <div class="subjects" id="subjectCards"></div>
+
+  <footer>
+    Tick items off here as you go &mdash; they're saved on this device only. For the full 417-point<br>
+    syllabus tracker, exam conditions and weekly reflection, open the <a href="https://mock-exam-tracker-raidentame1-3207s-projects.vercel.app/" style="color:var(--accent);">Tracker page</a>.
+  </footer>
+
+</div>
+
+<script>
+const SUBJECTS = {
+  "Literature": {color:"#f472b6", weight:"25%", note:"Single paper - 15 min planning, 120 min. Essay on The Picture of Dorian Gray."},
+  "Physics": {color:"#5eb0ff", weight:"50%", note:"2 papers - 5 min perusal, 90 min each. Calculator + formula book."},
+  "Mathematical Methods": {color:"#fbbf24", weight:"50%", note:"2 papers - 5 min perusal, 90 min each. Paper 1 tech-free."},
+  "Specialist Mathematics": {color:"#b794f6", weight:"50%", note:"2 papers - 5 min perusal, 90 min each. Paper 1 tech-free."},
+  "Physical Education": {color:"#22d3ee", weight:"25%", note:"Single paper - 5 min perusal, 120 min. MC, short & extended response."},
+  "Music": {color:"#fb923c", weight:"25%", note:"Single paper - 20 min planning, 120 min. Analysis/aural only."}
+};
+// Week 5 (past-paper week) and the exam period still use one subject per weekday (see below).
+const WEEKDAY_SUBJECT = {1:"Literature", 2:"Physics", 3:"Mathematical Methods", 4:"Specialist Mathematics"};
+// Real mock-exam-day subject, keyed by exact ISO date - from the school's published Yr 12 Mock
+// Exams 2026 timetable. Overrides the weekday-based guess above for the actual exam period
+// (EXAM_START..END); the weekday-based rotation above is still used for the Week 5 past-paper
+// practice days, which aren't tied to real exam dates.
+const EXAM_DATE_SUBJECT = {
+  "2026-09-07": "Literature",           // Mon 7 Sept, 8.45-11.15am
+  "2026-09-08": "Mathematical Methods", // Tue 8 Sept, 8.45-11.15am
+  "2026-09-09": "Music",                // Wed 9 Sept, 8.45-11.15am
+  "2026-09-10": "Physics",              // Thu 10 Sept, 12.00-2.50pm
+  "2026-09-11": "Physical Education",   // Fri 11 Sept, 12.00-2.50pm
+  "2026-09-14": "Specialist Mathematics", // Mon 14 Sept, 8.45-11.15am
+};
+// Content phase (before Week 5): restarted 12 Aug 2026 (7 days later than the original 5 Aug
+// plan, same fixed mock-exam date), so the content window is now ~13 weekdays instead of ~20.
+// To still reach every topic at least once before Week 5, EVERY weekday now covers all THREE
+// 50%-weighted "big" subjects (Physics/Methods/Specialist get a slot every single content day,
+// not 2-in-3 as before) plus one "small" subject slot, chosen by a weighted rotation proportional
+// to each small subject's topic count (Literature 6, PE 3, Music 2) so Literature - which has the
+// most topics of the three - gets more turns and still completes a full pass in time.
+const BIG3 = ["Physics", "Mathematical Methods", "Specialist Mathematics"];
+const SMALL3 = ["Literature", "Physical Education", "Music"];
+const SMALL_WEIGHTS = {"Literature":6, "Physical Education":3, "Music":2};
+function weightedSmallSubject(idx){
+  // Smooth weighted round-robin: deterministic given the content-weekday index, distributes
+  // slots proportionally to SMALL_WEIGHTS rather than strict 1-in-3 alternation.
+  const subs = Object.keys(SMALL_WEIGHTS);
+  const total = subs.reduce((a,s)=>a+SMALL_WEIGHTS[s],0);
+  const credits = {}; subs.forEach(s=>credits[s]=0);
+  let chosen = subs[0];
+  for(let i=0;i<=idx;i++){
+    subs.forEach(s=>credits[s]+=SMALL_WEIGHTS[s]);
+    chosen = subs.reduce((a,b)=>credits[a]>=credits[b]?a:b);
+    credits[chosen] -= total;
+  }
+  return chosen;
+}
+// Counts content days from START up to (not including) d. Only Sunday is excluded - Saturdays
+// count too, because the runway before Week 5 is now short enough (user pushed the start date
+// back twice) that a 2-day weekend no longer leaves room to reach every topic at least once.
+// Sunday stays the one fully protected rest day.
+function contentWeekdayIndex(d){
+  let idx = 0;
+  for(let c = new Date(START); c < d; c.setDate(c.getDate()+1)){
+    if(c.getDay()!==0) idx++;
+  }
+  return idx;
+}
+const START = new Date(2026,7,19);
+const WEEK5_START = new Date(2026,7,31);
+const EXAM_START = new Date(2026,8,7);
+const END = new Date(2026,8,17);
+
+const TOPICS = {
+  "Literature": [
+    ["Unit 3: Literature and identity", "Relationship between language, culture and identity in literary texts"],
+    ["Unit 3: Literature and identity", "Power of language to represent ideas, events and people"],
+    ["Unit 3: Literature and identity", "Creating analytical and imaginative texts"],
+    ["Unit 4: Independent explorations", "Dynamic nature of literary interpretation"],
+    ["Unit 4: Independent explorations", "Close examination of style, structure and subject matter"],
+    ["Unit 4: Independent explorations", "Creating analytical and imaginative texts"],
+  ],
+  "Physics": [
+    ["Unit 3: Gravity and electromagnetism", "Topic 1: Gravity and motion", "Ch 1&ndash;5, pp 34&ndash;151"],
+    ["Unit 3: Gravity and electromagnetism", "Topic 2: Electromagnetism", "Ch 6&ndash;8, pp 152&ndash;245"],
+    ["Unit 4: Revolutions in modern physics", "Topic 1: Special relativity", "Ch 9&ndash;10, pp 246&ndash;297"],
+    ["Unit 4: Revolutions in modern physics", "Topic 2: Quantum theory", "Ch 11&ndash;12, pp 298&ndash;349"],
+    ["Unit 4: Revolutions in modern physics", "Topic 3: The Standard Model", "Ch 13&ndash;14, pp 350&ndash;401"],
+  ],
+  "Mathematical Methods": [
+    ["Unit 3: Further calculus & intro to statistics", "Topic 1: Differentiation of exponential & logarithmic functions", "Ch 1, pp 4&ndash;60"],
+    ["Unit 3: Further calculus & intro to statistics", "Topic 2: Differentiation of trig functions & differentiation rules", "Ch 2 pp 72&ndash;120 &amp; Ch 3 pp 130&ndash;171"],
+    ["Unit 3: Further calculus & intro to statistics", "Topic 3: Further applications of differentiation", "Ch 4, pp 178&ndash;212"],
+    ["Unit 3: Further calculus & intro to statistics", "Topic 4: Introduction to integration", "Ch 5, pp 220&ndash;259"],
+    ["Unit 3: Further calculus & intro to statistics", "Topic 5: Discrete random variables", "Ch 6 pp 266&ndash;309 &amp; Ch 7 pp 316&ndash;346"],
+    ["Unit 4: Further calculus, trig & statistics", "Topic 1: Further integration", "Ch 8, pp 352&ndash;414"],
+    ["Unit 4: Further calculus, trig & statistics", "Topic 2: Trigonometry", "Ch 9, pp 422&ndash;461"],
+    ["Unit 4: Further calculus, trig & statistics", "Topic 3: Continuous random variables & normal distribution", "Ch 10 pp 462&ndash;505 &amp; Ch 11 pp 512&ndash;542"],
+    ["Unit 4: Further calculus, trig & statistics", "Topic 4: Sampling and proportions", "Ch 12, pp 548&ndash;561"],
+    ["Unit 4: Further calculus, trig & statistics", "Topic 5: Interval estimates for proportions", "Ch 12, pp 562&ndash;572"],
+  ],
+  "Specialist Mathematics": [
+    ["Unit 3: Further complex numbers, proof, vectors & matrices", "Topic 1: Further complex numbers", "Ch 1, pp 4&ndash;62"],
+    ["Unit 3: Further complex numbers, proof, vectors & matrices", "Topic 2: Mathematical induction & trig proofs (incl. multi-angle identities - moved here for 2026)", "Ch 2, pp 70&ndash;98"],
+    ["Unit 3: Further complex numbers, proof, vectors & matrices", "Topic 3: Vectors in two and three dimensions", "Ch 3, pp 102&ndash;197"],
+    ["Unit 3: Further complex numbers, proof, vectors & matrices", "Topic 4: Vector calculus", "Ch 4, pp 204&ndash;282"],
+    ["Unit 3: Further complex numbers, proof, vectors & matrices", "Topic 5: Further matrices", "Ch 5, pp 292&ndash;382"],
+    ["Unit 4: Further calculus & statistical inference", "Topic 1: Integration techniques", "Ch 6, pp 392&ndash;469"],
+    ["Unit 4: Further calculus & statistical inference", "Topic 2: Applications of integral calculus", "Ch 7, pp 478&ndash;545"],
+    ["Unit 4: Further calculus & statistical inference", "Topic 3: Rates of change & differential equations", "Ch 8 pp 552&ndash;613 &amp; Ch 9 pp 622&ndash;677"],
+    ["Unit 4: Further calculus & statistical inference", "Topic 4: Modelling motion", "Ch 10, pp 684&ndash;763"],
+    ["Unit 4: Further calculus & statistical inference", "Topic 5: Statistical inference", "Ch 11, pp 768&ndash;822"],
+  ],
+  "Physical Education": [
+    ["Unit 3: Tactical awareness and ethics", "Topic 1: Tactical awareness (dynamic systems, constraints-led approach, decision-making, principles of play)"],
+    ["Unit 3: Tactical awareness and ethics", "Topic 2: Ethics and integrity in physical activity"],
+    ["Unit 4: Energy, fitness and training", "Topic 1: Energy systems, fitness components, training principles/methods & periodisation"],
+  ],
+  "Music": [
+    ["Unit 3: Innovations", "Analyse/evaluate innovative use of duration, expressive devices, pitch, structure, texture & timbre in studied repertoire"],
+    ["Unit 4: Narratives", "Analyse/evaluate how music elements convey setting, drama, mood & characterisation in studied repertoire"],
+  ],
+};
+
+// Exam-frequency weights (% of 2020-2025 QCAA past-exam questions per topic, per
+// exam-insights.com "Historical Trends" pages, mapped from the outgoing 2019 syllabus's
+// topic groupings onto the 2026-syllabus topic list above). Subjects/topics with no
+// entry here default to equal weighting - i.e. unchanged cycling order.
+const TOPIC_WEIGHTS = {
+  "Physics": {
+    "Topic 1: Gravity and motion": 33,
+    "Topic 2: Electromagnetism": 25,
+    "Topic 2: Quantum theory": 18,
+    "Topic 3: The Standard Model": 13,
+    "Topic 1: Special relativity": 12,
+  },
+  "Mathematical Methods": {
+    "Topic 3: Further applications of differentiation": 19,
+    "Topic 3: Continuous random variables & normal distribution": 13,
+    "Topic 4: Introduction to integration": 12,
+    "Topic 1: Further integration": 11,
+    "Topic 1: Differentiation of exponential & logarithmic functions": 10,
+    "Topic 5: Discrete random variables": 10,
+    "Topic 5: Interval estimates for proportions": 9,
+    "Topic 2: Differentiation of trig functions & differentiation rules": 9,
+    "Topic 2: Trigonometry": 7,
+    "Topic 4: Sampling and proportions": 5,
+  },
+  "Specialist Mathematics": {
+    "Topic 5: Statistical inference": 18,
+    "Topic 1: Further complex numbers": 16,
+    "Topic 3: Vectors in two and three dimensions": 14,
+    "Topic 3: Rates of change & differential equations": 10,
+    "Topic 1: Integration techniques": 9,
+    "Topic 4: Vector calculus": 7,
+    "Topic 5: Further matrices": 7,
+    "Topic 2: Applications of integral calculus": 7,
+    "Topic 2: Mathematical induction & trig proofs (incl. multi-angle identities - moved here for 2026)": 6,
+    "Topic 4: Modelling motion": 6,
+  },
+};
+const weightedTopicsCache = {};
+// Returns TOPICS[s] re-ordered by descending exam weight, so the highest-yield
+// topics reach the front of the study rotation first. Subjects with no weight
+// data sort stably into their original (unchanged) order.
+function getWeightedTopics(s){
+  if(weightedTopicsCache[s]) return weightedTopicsCache[s];
+  const w = TOPIC_WEIGHTS[s];
+  const list = w ? TOPICS[s].slice().sort((a,b)=>(w[b[1]]||0)-(w[a[1]]||0)) : TOPICS[s];
+  weightedTopicsCache[s] = list;
+  return list;
+}
+
+// Per-lesson textbook (or, for Literature, novel-chapter) references, keyed by
+// "<unit> :: <topic>" so identically-named topics in different units (Literature has
+// two "Creating analytical and imaginative texts" entries) never collide. Each entry
+// carries a specific chapter/subtopic, page range and (for the maths/science subjects)
+// worked-example numbers - lifted directly from the audited Tracker pages, plus a new
+// chapter-by-chapter breakdown of the uploaded novel for Literature. Physical Education
+// and Music have no textbook, so they simply have no entry and fall back to the plain
+// topic name further down.
+const LESSON_REFS = {"Literature": {"Unit 3: Literature and identity :: Relationship between language, culture and identity in literary texts": [{"lesson": "Ch I · Already read (revise) &mdash; close-read for this topic's lens — Basil's studio; his artistic obsession with Dorian as muse; Lord Henry's aestheticist philosophy first voiced","pages": "2–10","we": []},{"lesson": "Ch II · Already read (revise) &mdash; close-read for this topic's lens — Dorian meets Lord Henry, hears his hedonistic 'new Hedonism'; sees Basil's finished portrait; makes the fateful wish","pages": "11–21","we": []}],"Unit 3: Literature and identity :: Power of language to represent ideas, events and people": [{"lesson": "Ch III · Already read (revise) &mdash; close-read for this topic's lens — Lord Henry investigates Dorian's family history via his uncle; Dorian established as Henry's aesthetic 'experiment'","pages": "22–32","we": []},{"lesson": "Ch IV · Already read (revise) &mdash; close-read for this topic's lens — Dorian's engagement to Sibyl Vane announced; his idealisation of her as pure artistic performance introduced","pages": "33–36","we": []}],"Unit 3: Literature and identity :: Creating analytical and imaginative texts": [{"lesson": "Ch V · Already read (revise) &mdash; close-read for this topic's lens — Sibyl's home; her mother and brother James; James's foreboding warning about Dorian's intentions","pages": "37–44","we": []},{"lesson": "Ch VI · Already read (revise) &mdash; close-read for this topic's lens — Basil and Lord Henry debate Dorian's character and the engagement; competing philosophies of influence","pages": "45–53","we": []}],"Unit 4: Independent explorations :: Dynamic nature of literary interpretation": [{"lesson": "Ch VII · Already read (revise) &mdash; close-read for this topic's lens — Sibyl's ruined performance once she feels real love instead of 'acting'; Dorian's cruel rejection; portrait's first change","pages": "54–60","we": []},{"lesson": "Ch VIII · Already read (revise) &mdash; close-read for this topic's lens — Dorian's guilt after Sibyl's death; Basil visits; Dorian resolves to hide the portrait from the world","pages": "61–67","we": []}],"Unit 4: Independent explorations :: Close examination of style, structure and subject matter": [{"lesson": "Ch IX · Not yet read &mdash; read this chapter, then close-read for this topic's lens — News of Sibyl's suicide reframed by Lord Henry as aesthetic tragedy; the corrupting 'yellow book' takes hold","pages": "68–80","we": []},{"lesson": "Ch X · Not yet read &mdash; read this chapter, then close-read for this topic's lens — The catalogue of luxuries and historical figures Dorian obsesses over; his aesthetic decadence deepens across years","pages": "81–85","we": []}],"Unit 4: Independent explorations :: Creating analytical and imaginative texts": [{"lesson": "Ch XI · Not yet read &mdash; read this chapter, then close-read for this topic's lens — Basil confronts Dorian about rumours of his corrupting influence on others; asks to see the hidden portrait","pages": "86–90","we": []},{"lesson": "Ch XII · Not yet read &mdash; read this chapter, then close-read for this topic's lens — Dorian shows Basil the ruined portrait and murders him &mdash; the novel's central crime","pages": "91–98","we": []},{"lesson": "Ch XIII · Not yet read &mdash; read this chapter, then close-read for this topic's lens — Dorian blackmails Alan Campbell to dispose of the body; the novel's climax and moral reckoning","pages": "99–107","we": []}]},"Physics": {"Unit 3: Gravity and electromagnetism :: Topic 1: Gravity and motion": [{"lesson": "Ch 1 · 1.1 Representing vectors & resolving into perpendicular components","pages": "36-42","we": []},{"lesson": "Ch 1 · 1.2 Combining vectors / projectile motion basics (horizontal & angled projection)","pages": "43-49","we": ["1.2A","1.2C","1.2D"]},{"lesson": "Ch 1 · 1.3 Horizontal & vertical velocity components; independence of components","pages": "50-65","we": ["1.3C"]},{"lesson": "Ch 1 · 1.4 Forces on an object (weight, normal, applied, friction, tension) — leads into inclined planes","pages": "66-68","we": []},{"lesson": "Ch 2 · 2.1 Forces on an inclined plane: weight, normal force, friction, tension","pages": "71-74","we": []},{"lesson": "Ch 2 · 2.2 Free-body diagrams and forces on an inclined plane (parallel/perpendicular components)","pages": "75-84","we": ["2.2D","2.2E"]},{"lesson": "Ch 2 · 2.3 Net force on an inclined plane using vector analysis","pages": "85-96","we": []},{"lesson": "Ch 3 · 3.1 Uniform circular motion — force perpendicular to velocity","pages": "99-102","we": []},{"lesson": "Ch 3 · 3.2 Average speed and period in circular motion","pages": "103-107","we": []},{"lesson": "Ch 3 · 3.3 Centripetal acceleration and centripetal force; solving circular motion problems","pages": "108-118","we": ["3.3B","3.3D"]},{"lesson": "Ch 4 · 4.1 What gravity is; gravitational force between masses","pages": "121-122","we": []},{"lesson": "Ch 4 · 4.2 Newton's Law of Universal Gravitation (solving problems)","pages": "123-129","we": ["+2 more (OCR unclear)"]},{"lesson": "Ch 4 · 4.3 Gravitational fields and gravitational field strength","pages": "130-137","we": ["+1 more (OCR unclear)"]},{"lesson": "Ch 5 · 5.1 Kepler's Laws of planetary motion; deriving Kepler's third law","pages": "140-145","we": ["+2 more (OCR unclear)"]},{"lesson": "Ch 5 · 5.2 Contributions of scientists (Newton, Kepler, du Chatelet, Katherine Johnson); gravity waves/LIGO international collaboration","pages": "146-147","we": []},{"lesson": "Ch 5 · 5.3 Satellite orbits — positioning of satellites, space debris management","pages": "148-153","we": []}],"Unit 3: Gravity and electromagnetism :: Topic 2: Electromagnetism": [{"lesson": "Ch 6 · 6.1 Coulomb's Law and electric charge (incl. Cavendish/Coulomb history)","pages": "156-163","we": ["6.1C"]},{"lesson": "Ch 6 · 6.2 Electric fields, electric field strength and electrical potential energy","pages": "164-171","we": ["6.2"]},{"lesson": "Ch 6 · 6.3 Electric potential and equipotential lines; work done moving a charge in a field","pages": "172-181","we": []},{"lesson": "Ch 7 · 7.1 Magnetic fields — origin, direction, field line diagrams","pages": "184-187","we": []},{"lesson": "Ch 7 · 7.2 Magnetic fields around current-carrying wires; field strength","pages": "188-193","we": ["+3 more (OCR unclear)"]},{"lesson": "Ch 7 · 7.3 Magnetic fields in solenoids","pages": "194-196","we": []},{"lesson": "Ch 7 · 7.4 Force on a charged particle & on a current-carrying wire in a magnetic field","pages": "197-203","we": ["+2 more (OCR unclear)"]},{"lesson": "Ch 7 · 7.5 Square Kilometre Array (SKA) — international collaboration extension","pages": "204-209","we": []},{"lesson": "Ch 8 · 8.1 Magnetic flux and magnetic flux density","pages": "212-216","we": []},{"lesson": "Ch 8 · 8.2 Electromagnetic induction — inducing EMF, Faraday's Law","pages": "217-221","we": ["8.2A","8.2B"]},{"lesson": "Ch 8 · 8.3 Faraday's Law, Lenz's Law and conservation of energy","pages": "222-226","we": []},{"lesson": "Ch 8 · 8.4 Transformers and electromagnetic induction problems","pages": "227-231","we": []},{"lesson": "Ch 8 · 8.5 Electromagnetic waves — electric & magnetic field radiation","pages": "232-235","we": []},{"lesson": "Ch 8 · 8.6 Electromagnetic phenomena risk/safety (wi-fi, mobile phones, MRI) — extension","pages": "236-243","we": []}],"Unit 4: Revolutions in modern physics :: Topic 1: Special relativity": [{"lesson": "Ch 9 · 9.1 Frames of reference, inertial frames, postulates of special relativity","pages": "246-249","we": []},{"lesson": "Ch 9 · 9.2 Motion relative to an observer; constant speed of light; simultaneity","pages": "250-254","we": []},{"lesson": "Ch 9 · 9.3 Relativity of simultaneity (events, thought experiments)","pages": "255-258","we": []},{"lesson": "Ch 9 · 9.4 Proper time, relativistic time interval, time dilation, mean lifetime of a particle","pages": "259-269","we": ["+2 more (OCR unclear)"]},{"lesson": "Ch 10 · 10.1 Length contraction, proper length, relativistic length (space travel)","pages": "272-277","we": ["+1 more (OCR unclear)"]},{"lesson": "Ch 10 · 10.2 Rest mass, relativistic momentum, mass-energy equivalence; speed limit of light","pages": "278-283","we": ["+3 more (OCR unclear)"]},{"lesson": "Ch 10 · 10.3 Mass-energy equivalence — nuclear fission application","pages": "284-285","we": []},{"lesson": "Ch 10 · 10.4 Paradoxes: twins paradox, ladder-in-barn, time travel","pages": "286-289","we": []},{"lesson": "Ch 10 · 10.5 GPS & relativity application (extension)","pages": "290-295","we": []}],"Unit 4: Revolutions in modern physics :: Topic 2: Quantum theory": [{"lesson": "Ch 11 · 11.1 Double-slit experiment & light as an electromagnetic wave","pages": "298-302","we": ["+1 more (OCR unclear)"]},{"lesson": "Ch 11 · 11.2 Black-body radiation — evidence for quantisation","pages": "303-305","we": ["11.2A"]},{"lesson": "Ch 11 · 11.3 Black-body radiation & the greenhouse effect (extension: climate patterns)","pages": "306-307","we": []},{"lesson": "Ch 11 · 11.4 Photons and the Planck equation","pages": "308-310","we": ["+1 more (OCR unclear)"]},{"lesson": "Ch 11 · 11.5 The photoelectric effect, threshold frequency, work function","pages": "311-325","we": ["+2 more (OCR unclear)"]},{"lesson": "Ch 12 · 12.1 Rutherford's model of the atom (1911 gold-foil experiment)","pages": "328-331","we": []},{"lesson": "Ch 12 · 12.2 Bohr's model of the atom; light quanta and atomic energy states; line spectra","pages": "332-337","we": ["12.2A","+1 more (OCR unclear)"]},{"lesson": "Ch 12 · 12.3 Wave-particle duality of light","pages": "338-347","we": ["12.3B","+1 more (OCR unclear)"]}],"Unit 4: Revolutions in modern physics :: Topic 3: The Standard Model": [{"lesson": "Ch 13 · 13.1 Elementary particles & antiparticles; six quarks; baryons, mesons and leptons","pages": "350-355","we": []},{"lesson": "Ch 13 · 13.2 The four fundamental forces and gauge bosons (strong, weak, EM)","pages": "356-361","we": []},{"lesson": "Ch 13 · 13.3 Evidence supporting the Big Bang theory (cosmic background radiation, Hubble's Law) — extension","pages": "362-369","we": []},{"lesson": "Ch 14 · 14.1 Lepton number and baryon number; conservation principles (solve problems)","pages": "372-378","we": ["14.1A","14.1B","14.1C","14.1D","14.1F"]},{"lesson": "Ch 14 · 14.2 Particle interaction (Feynman) diagrams: electron/electron, electron/positron, neutron decay","pages": "379-385","we": []},{"lesson": "Ch 14 · 14.3 Symmetry in particle interactions","pages": "386-399","we": ["+2 more (OCR unclear)"]}]},"Mathematical Methods": {"Unit 3: Further calculus & intro to statistics :: Topic 1: Differentiation of exponential & logarithmic functions": [{"lesson": "Ch 1 · 1.2 Limits","pages": "5–10","we": [1,2,3]},{"lesson": "Ch 1 · 1.3 The exponential function","pages": "11–19","we": [4,5,6,7,8]},{"lesson": "Ch 1 · 1.4 Differentiation of exponential functions","pages": "20–24","we": [9,10,11,12]},{"lesson": "Ch 1 · 1.5 The logarithmic function","pages": "25–33","we": [13,14,15]},{"lesson": "Ch 1 · 1.6 Solving equations","pages": "34–38","we": [16,17,18,19]},{"lesson": "Ch 1 · 1.7 Differentiation of logarithmic functions","pages": "39–43","we": [20,21]},{"lesson": "Ch 1 · 1.8 Modelling and solving with exponential and logarithmic functions","pages": "44–55","we": [22,23,24,25]},{"lesson": "Ch 1 · 1.9 Review","pages": "56–60","we": []}],"Unit 3: Further calculus & intro to statistics :: Topic 2: Differentiation of trig functions & differentiation rules": [{"lesson": "Ch 2 · 2.4 Differentiation of trigonometric functions","pages": "97–103","we": [10,11,12]},{"lesson": "Ch 2 · 2.5 Modelling and solving with trigonometric functions","pages": "104–115","we": [13,14]},{"lesson": "Ch 2 · 2.6 Review","pages": "116–120","we": []},{"lesson": "Ch 3 · 3.2 The chain rule","pages": "131–138","we": [1,2,3,4]},{"lesson": "Ch 3 · 3.3 The product rule","pages": "139–143","we": [5,6,7]},{"lesson": "Ch 3 · 3.4 The quotient rule","pages": "144–149","we": [8,9,10]},{"lesson": "Ch 3 · 3.5 Modelling and solving using the differentiation rules","pages": "150–165","we": [11,12,13,14,15,16,17]},{"lesson": "Ch 3 · 3.6 Review","pages": "166–171","we": []}],"Unit 3: Further calculus & intro to statistics :: Topic 3: Further applications of differentiation": [{"lesson": "Ch 4 · 4.2 Second derivatives","pages": "179–184","we": [1,2,3,4]},{"lesson": "Ch 4 · 4.3 Concavity and points of inflection","pages": "185–190","we": [5,6,7]},{"lesson": "Ch 4 · 4.4 Curve sketching","pages": "191–200","we": [8,9,10]},{"lesson": "Ch 4 · 4.5 Modelling and solving optimisation problems","pages": "201–207","we": [11,12]},{"lesson": "Ch 4 · 4.6 Review","pages": "208–212","we": []}],"Unit 3: Further calculus & intro to statistics :: Topic 4: Introduction to integration": [{"lesson": "Ch 5 · 5.2 Anti-differentiation of rational functions","pages": "221–227","we": [1,2,3,4]},{"lesson": "Ch 5 · 5.3 Anti-differentiation of exponential functions","pages": "228–231","we": [5,6]},{"lesson": "Ch 5 · 5.4 Anti-differentiation of logarithmic functions","pages": "232–235","we": [7,8]},{"lesson": "Ch 5 · 5.5 Anti-differentiation of trigonometric functions","pages": "236–239","we": [9,10,11]},{"lesson": "Ch 5 · 5.6 Further integration","pages": "240–246","we": [12,13,14,15,16]},{"lesson": "Ch 5 · 5.7 Modelling and solving using indefinite integrals","pages": "247–254","we": [17,18,19]},{"lesson": "Ch 5 · 5.8 Review","pages": "255–259","we": []}],"Unit 3: Further calculus & intro to statistics :: Topic 5: Discrete random variables": [{"lesson": "Ch 6 · 6.2 Discrete random variables","pages": "267–278","we": [1,2,3,4,5,6,7,8]},{"lesson": "Ch 6 · 6.3 Expected values","pages": "279–288","we": [9,10,11,12,13,14]},{"lesson": "Ch 6 · 6.4 Variance and standard deviation","pages": "289–297","we": [15,16]},{"lesson": "Ch 6 · 6.5 Modelling and solving with discrete random variables","pages": "298–303","we": [17]},{"lesson": "Ch 6 · 6.6 Review","pages": "304–309","we": []},{"lesson": "Ch 7 · 7.2 Bernoulli distributions","pages": "317–322","we": [1,2]},{"lesson": "Ch 7 · 7.3 Binomial distributions","pages": "323–332","we": [3,4,5]},{"lesson": "Ch 7 · 7.4 The mean and variance of a binomial distribution","pages": "333–336","we": [6]},{"lesson": "Ch 7 · 7.5 Modelling and solving with Bernoulli and binomial distributions","pages": "337–341","we": [7]},{"lesson": "Ch 7 · 7.6 Review","pages": "342–346","we": []}],"Unit 4: Further calculus, trig & statistics :: Topic 1: Further integration": [{"lesson": "Ch 8 · 8.2 Estimating the area under a curve","pages": "353–364","we": [1,2,3]},{"lesson": "Ch 8 · 8.3 The fundamental theorem of calculus","pages": "365–373","we": [4,5,6]},{"lesson": "Ch 8 · 8.4 Areas under a curve","pages": "374–384","we": [7,8,9]},{"lesson": "Ch 8 · 8.5 Areas between curves","pages": "385–394","we": [10,11,12]},{"lesson": "Ch 8 · 8.6 Modelling and solving with definite integrals","pages": "395–407","we": [13,14,15,16,17]},{"lesson": "Ch 8 · 8.7 Review","pages": "408–414","we": []}],"Unit 4: Further calculus, trig & statistics :: Topic 2: Trigonometry": [{"lesson": "Ch 9 (source redacted)","pages": "422–461","we": [],"note": "Worked-example numbers unavailable – use JacPLUS online worked solutions or the Chapter 9 exam question booklet"}],"Unit 4: Further calculus, trig & statistics :: Topic 3: Continuous random variables & normal distribution": [{"lesson": "Ch 10 · 10.2 Continuous random variables and the probability density function","pages": "463–478","we": [1,2,3,4,5]},{"lesson": "Ch 10 · 10.3 Cumulative distribution functions","pages": "479–489","we": [6,7]},{"lesson": "Ch 10 · 10.4 Measures of centre and spread","pages": "490–498","we": [8,9]},{"lesson": "Ch 10 · 10.5 Review","pages": "499–505","we": []},{"lesson": "Ch 11 · 11.2 The normal distribution","pages": "513–520","we": [1,2]},{"lesson": "Ch 11 · 11.3 Standardised normal variables","pages": "521–525","we": [3]},{"lesson": "Ch 11 · 11.4 The inverse normal distribution","pages": "526–530","we": [4,5]},{"lesson": "Ch 11 · 11.5 Modelling and solving with normal distributions","pages": "531–537","we": [6]},{"lesson": "Ch 11 · 11.6 Review","pages": "538–542","we": []}],"Unit 4: Further calculus, trig & statistics :: Topic 4: Sampling and proportions": [{"lesson": "Ch 12 · 12.2 Random sampling","pages": "550–556","we": [1,2,3,4]},{"lesson": "Ch 12 · 12.3 Sample proportions","pages": "557–561","we": [5,6,7]}],"Unit 4: Further calculus, trig & statistics :: Topic 5: Interval estimates for proportions": [{"lesson": "Ch 12 · 12.4 Confidence intervals for proportions","pages": "562–567","we": [8,9,10]},{"lesson": "Ch 12 · 12.5 Review","pages": "568–572","we": []}]},"Specialist Mathematics": {"Unit 3: Further complex numbers, proof, vectors & matrices :: Topic 1: Further complex numbers": [{"lesson": "Ch 1 · 1.3 Complex arithmetic using polar form","pages": "23–30","we": [13,14]},{"lesson": "Ch 1 · 1.4 Roots of complex numbers","pages": "31–42","we": [15,16,17,18,19]},{"lesson": "Ch 1 · 1.5 Factorisation of polynomials","pages": "43–58","we": [20,21,22,23,24,25,26,27,28,29,30,31,32]},{"lesson": "Ch 1 · 1.6 Review","pages": "59–62","we": []}],"Unit 3: Further complex numbers, proof, vectors & matrices :: Topic 2: Mathematical induction & trig proofs (incl. multi-angle identities - moved here for 2026)": [{"lesson": "Ch 2 · 2.2 Proof by induction","pages": "71–84","we": [1,2,3,4,5,6]},{"lesson": "Ch 2 · 2.3 Proofs of divisibility","pages": "85–87","we": [7,8]},{"lesson": "Ch 2 · 2.4 Trigonometric proofs using De Moivre's theorem","pages": "88–95","we": [9,10,11,12,13]},{"lesson": "Ch 2 · 2.5 Review","pages": "96–98","we": []}],"Unit 3: Further complex numbers, proof, vectors & matrices :: Topic 3: Vectors in two and three dimensions": [{"lesson": "Ch 3 · 3.2 Vectors in three dimensions","pages": "104–119","we": [1,2]},{"lesson": "Ch 3 · 3.3 Algebra of three dimensional vectors","pages": "120–129","we": [3,4,5,6,7,8]},{"lesson": "Ch 3 · 3.4 Geometric proofs using vectors","pages": "130–141","we": [9,10,11,12,13,14,15]},{"lesson": "Ch 3 · 3.5 Vector, parametric and Cartesian equations","pages": "142–163","we": [16,17,18,19,20,21,22,23,24,25]},{"lesson": "Ch 3 · 3.6 The vector (cross) product","pages": "164–178","we": [26,27,28,29,30,31,32]},{"lesson": "Ch 3 · 3.7 Applications of vectors","pages": "179–193","we": [33,34,35,36,37,38,39]},{"lesson": "Ch 3 · 3.8 Review","pages": "194–197","we": []}],"Unit 3: Further complex numbers, proof, vectors & matrices :: Topic 4: Vector calculus": [{"lesson": "Ch 4 · 4.2 Position vectors as functions of time — circles, ellipses and hyperbolas","pages": "205–220","we": [1,2,3,4,5,6,7,8,9,10]},{"lesson": "Ch 4 · 4.3 Collision problems","pages": "221–230","we": [11,12,13,14,15]},{"lesson": "Ch 4 · 4.4 Differentiation and integration of vectors","pages": "231–246","we": [16,17,18,19,20,21,22,23,24]},{"lesson": "Ch 4 · 4.5 Straight line motion with constant and variable acceleration","pages": "247–257","we": [25,26,27,28,29]},{"lesson": "Ch 4 · 4.6 Applications of vector calculus","pages": "258–277","we": [30,31,32,33,34,35,36,37,38,39]},{"lesson": "Ch 4 · 4.7 Review","pages": "278–282","we": []}],"Unit 3: Further complex numbers, proof, vectors & matrices :: Topic 5: Further matrices": [{"lesson": "Ch 5 · 5.2 Solving linear equations using matrix algebra","pages": "294–314","we": [1,2,3,4,5,6,7,8,9,10]},{"lesson": "Ch 5 · 5.3 Solving a system of linear equations using Gaussian elimination","pages": "315–322","we": [11,12]},{"lesson": "Ch 5 · 5.4 The three cases for solutions of systems of linear equations","pages": "323–346","we": [13,14,15,16,17,18,19,20,21]},{"lesson": "Ch 5 · 5.5 Dominance and Leslie matrices","pages": "347–356","we": [22,23]},{"lesson": "Ch 5 · 5.6 Applications of matrices","pages": "357–376","we": [24,25,26,27,28,29,30,31,32]},{"lesson": "Ch 5 · 5.7 Review","pages": "377–382","we": []}],"Unit 4: Further calculus & statistical inference :: Topic 1: Integration techniques": [{"lesson": "Ch 6 · 6.2 Integration by linear substitution","pages": "394–405","we": [1,2,3,4,5,6]},{"lesson": "Ch 6 · 6.3 Integration by non-linear substitutions","pages": "406–414","we": [7,8,9,10,11,12]},{"lesson": "Ch 6 · 6.4 Integration using the trigonometric identities","pages": "415–427","we": [13,14,15,16,17,18,19]},{"lesson": "Ch 6 · 6.5 Integration of inverse trigonometric functions","pages": "428–449","we": [20,21,22,23,24,25,26,27,28,29,30]},{"lesson": "Ch 6 · 6.6 Integration by parts","pages": "450–456","we": [31,32,33,34]},{"lesson": "Ch 6 · 6.7 Integration involving partial fractions","pages": "457–465","we": [35,36,37,38,39]},{"lesson": "Ch 6 · 6.8 Review","pages": "466–469","we": []}],"Unit 4: Further calculus & statistical inference :: Topic 2: Applications of integral calculus": [{"lesson": "Ch 7 · 7.2 Area between a function and the axes","pages": "480–488","we": [1,2,3,4]},{"lesson": "Ch 7 · 7.3 Area between functions","pages": "489–501","we": [5,6,7,8]},{"lesson": "Ch 7 · 7.4 Volumes of solids of revolution","pages": "502–511","we": [9,10,11]},{"lesson": "Ch 7 · 7.5 Volumes of revolution","pages": "512–523","we": [12,13,14]},{"lesson": "Ch 7 · 7.6 Approximation using Simpson's rule","pages": "524–534","we": [15,16,17]},{"lesson": "Ch 7 · 7.7 Exponential probability density function","pages": "535–541","we": [18,19]},{"lesson": "Ch 7 · 7.8 Review","pages": "542–545","we": []}],"Unit 4: Further calculus & statistical inference :: Topic 3: Rates of change & differential equations": [{"lesson": "Ch 8 · 8.2 Implicit differentiation","pages": "554–562","we": [1,2,3,4]},{"lesson": "Ch 8 · 8.3 Related rates as instances of the chain rule","pages": "563–571","we": [5,6,7,8]},{"lesson": "Ch 8 · 8.4 Solving differential equations of the form dy/dx = f(x)","pages": "572–580","we": [9,10,11,12]},{"lesson": "Ch 8 · 8.5 Solving differential equations of the form dy/dx = g(y)","pages": "581–588","we": [13,14,15,16]},{"lesson": "Ch 8 · 8.6 Solving differential equations of the form dy/dx = f(x)g(y)","pages": "589–593","we": [17,18,19]},{"lesson": "Ch 8 · 8.7 Slope fields","pages": "594–607","we": [20,21,22,23]},{"lesson": "Ch 8 · 8.8 Review","pages": "608–613","we": []},{"lesson": "Ch 9 · 9.2 Growth and decay","pages": "623–633","we": [1,2,3,4,5,6]},{"lesson": "Ch 9 · 9.3 Other applications of first-order differential equations","pages": "634–640","we": [7,8,9]},{"lesson": "Ch 9 · 9.4 Bounded growth and Newton's law of cooling","pages": "641–647","we": [10,11]},{"lesson": "Ch 9 · 9.5 Chemical reactions and dilution problems","pages": "648–658","we": [12,13,14]},{"lesson": "Ch 9 · 9.6 The logistic equation","pages": "659–671","we": [15,16]},{"lesson": "Ch 9 · 9.7 Review","pages": "672–677","we": []}],"Unit 4: Further calculus & statistical inference :: Topic 4: Modelling motion": [{"lesson": "Ch 10 · 10.2 Equilibrium situations under concurrent forces","pages": "686–704","we": [1,2,3,4,5,6,7,8,9,10]},{"lesson": "Ch 10 · 10.3 Non-equilibrium situations under concurrent forces","pages": "705–713","we": [11,12,13,14]},{"lesson": "Ch 10 · 10.4 Forces that depend on time","pages": "714–725","we": [15,16,17,18,19,20]},{"lesson": "Ch 10 · 10.5 Forces that depend on velocity","pages": "726–743","we": [21,22,23,24,25,26]},{"lesson": "Ch 10 · 10.6 Forces that depend on displacement","pages": "744–759","we": [27,28,29,30,31,32]},{"lesson": "Ch 10 · 10.7 Review","pages": "760–763","we": []}],"Unit 4: Further calculus & statistical inference :: Topic 5: Statistical inference": [{"lesson": "Ch 11 · 11.2 Sampling distributions","pages": "770–784","we": [1,2,3,4]},{"lesson": "Ch 11 · 11.3 Confidence intervals","pages": "785–794","we": [5,6,7,8]},{"lesson": "Ch 11 · 11.4 Margin of error, level of confidence and sample size","pages": "795–800","we": [9,10,11]},{"lesson": "Ch 11 · 11.5 Applications and other distributions","pages": "801–816","we": [12,13,14,15]},{"lesson": "Ch 11 · 11.6 Review","pages": "817–822","we": []}]}};
+
+const VIDEO_LINKS = {"Mathematical Methods": {"Topic 1: Differentiation of exponential & logarithmic functions": [["Derivatives of exponential functions - An introduction","CnoV-ZHNcJ4"],["Derivatives of exponential functions - Simple rules","YFQpetGnGks"],["Applications of derivatives of exponential functions","jIM9jHgTDso"],["Derivatives of exponential, logarithmic and trig functions","aQXU_ibiU98"],["Exponential models using e","gvBO4ZiuMd4"],["Solving equations involving natural log","C1VCMfGEi2Q"],["e to the power of ln(x)","V553m9SAGgk"],["Derivatives of logarithmic functions - Introduction","bx6UDR3T7YQ"],["Derivatives of logarithmic functions - Simple rules","k7Aisq8M89Y"],["Logarithmic modelling - 3 quick examples","CWUktb548a0"]],"Topic 2: Differentiation of trig functions & differentiation rules": [["Derivatives of exponential, logarithmic and trig functions","aQXU_ibiU98"],["Derivatives of periodic functions - Applications 1","qQ1ISPIrurY"],["Derivatives of periodic functions - Applications 2","f_HPieXhnpw"],["The chain rule revisited","Xt99tu7a_xg"],["The product rule revisited","o91UecsXULs"]],"Topic 3: Further applications of differentiation": [["Joining two functions so gradients match: Part 1 (PSMT prep)","DZLq9Z82B5A"],["Joining two functions so gradients match: Part 2 (PSMT prep)","0i9EdXyI4kw"],["Average vs instantaneous rates of change","XdoU9rTc3Pc"],["Rates of change application","wMT7-1Pdmuk"],["Motion in a straight line - an application of rates","QouC6D4efV0"],["Motion in a straight line - acceleration recap","dON8bqPSRB4"],["Finding stationary points","EZrzfiefulg"],["Nature of stationary points","1mMn_ep1Qn4"],["Sketching the derivative function from a picture","d03ZHkY5w4c"],["Concave up and concave down Part 1: 2 useful definitions","yuDfxgLFGo0"],["Concave up and concave down Part 2: a more useful definition","rbdTlMwZ2JI"],["Concavity and the second derivative","GXha2zENIdQ"],["Points of inflection and the 2nd derivative","8ddkoXSmzqk"],["The 2nd derivative test","bA3yDs3azqs"],["Sketching functions with 2nd derivative & points of inflection","hUrdDWnCRYg"],["Introduction to kinematics","9HkvFrF4FkA"],["Optimisation when the function is unknown","vYQYmnW3laU"],["A fun optimisation question","balgIIlDH3I"],["Optimisation: optimising profit","uEod7b3vhnA"]],"Topic 4: Introduction to integration": [["Intro to integration and integrating polynomials","xpYC11wlxxM"],["Integration - a little bit of theory","a7OstDCRpmM"],["Integration - finding the c value","sNyi7KO3rdA"],["Integration - the reverse chain rule","JonfZoEfWcA"],["Integration resulting in a logarithm","wguTt7rBysc"],["Integration - integral of exponentials","CT5VtM8vsmk"],["Integration by recognition (updated)","7vy5s0vvNlM"],["Applications of integration in motion questions","LUNLbp8KJIY"]],"Topic 5: Discrete random variables": [["Discrete random variables: introduction and examples","IxozOkJT0N8"],["Discrete random variables - uniform distribution","xRNCmCCR5po"],["Discrete random variable worked example","LvANa5sFpXA"],["The geometric probability distribution","DjPsm8XncCk"],["Expected value of discrete random distributions","nvHQodl8i0g"],["Discrete random distributions - expected value (challenging)","ZNPJolIXkpc"],["Variance and standard deviation: discrete random variables","c76XUgffeQg"],["Properties of expected value: aE(X)+b = E(aX+b)","fhaVdzxB4P4"],["The alternative variance formula - proof","BX0Hmfc2s-s"],["Alternative variance formula - worked example","ZfFxKPESfjw"],["Bernoulli sequence","v-hQhVvvxv4"],["Binomial distribution introduction","Vk5cJLUKHrc"],["Developing binomial distribution intuition","DRB5eK3K_s0"],["The binomial probability formula","mkW4i0AtXAY"],["Binomial probability distribution formula - worked example","s5WVzhibymQ"],["Binomial probability formula - at most and at least","fFMyCKxdzLg"],["Binomial distribution on the Casio fx-CG50AU","VCHZyE2TiLE"],["Binomial probability - conditional probability","rvZ00NzgNBw"],["Binomial distribution - expected value, variance & sd","WAreb1hMfZE"],["Construct a binomial distribution graph","QYqSGPyHUgs"],["Binomial distribution - finding a sample size","RvHX_MuXFT0"],["Binomial probability: guessing every MC question","nwuIedtiqhw"]],"Topic 1: Further integration": [["Exact area under a curve & rectangle/trapezoidal estimates (GeoGebra)","HgAYsljpeTw"],["The definite integral","-qgmqin_LLw"],["The definite integral - signed area","U1Clh4CwnRQ"],["Area between two curves","hdVgBGx3gcg"],["The area under a derivative function","5DpFEdU3a70"],["Trapezoidal rule - fully explained","LuSep-DFhIA"]],"Topic 2: Trigonometry": [["Trig ratios fast","L2vs4mmZty0"],["Introduction to the sine and cosine rule","oY7cB-6ahbc"],["The sine rule and where it comes from","q7pAwkMkE7A"],["Sine rule - finding unknown sides","kn2Q0Qf26-s"],["Sine rule - finding unknown angles part 1","lB3iuIBQixc"],["Sine rule - finding unknown angles part 2 (ambiguous case)","pIzhsbW-SZM"],["The sine rule fast","pjP0TF2sDBk"],["The sine rule - ambiguous case","ZdHIKpZRGZA"],["Cosine rule - proof","MVL1y9vtTqg"],["Cosine rule - finding unknown lengths","J9td5k-Nu2c"],["Cosine rule - finding unknown angles","wbh1T5OhOxw"],["The cosine rule","kXXmADxErHY"],["The area of a triangle using trigonometry","JuB6DNAj8q8"],["True bearings","FupuhWO0TIQ"],["Bearings and trigonometry - an example","FjLV2ZtGKvI"],["How to draw diagrams for trig applications (bearings/elevation)","-bmhmnLLcWI"]],"Topic 3: Continuous random variables & normal distribution": [["Estimating probability of a CRV using data","zk1RF_8j-3U"],["The probability density function","3cx5uOXIbj0"],["Calculating probability using a probability density function","fol6lktcmAA"],["Proving a function is a probability density function","03RU_yd2qPQ"],["Unknowns in probability density functions","07IcZaHY-nI"],["Unbounded probability density functions","bM9LuSByYMg"],["The mean of a continuous random variable","2u_tt6mChaI"],["Calculating percentiles from a probability density function","bvur5uHN2hQ"],["Calculating variance and sd of a continuous random variable","CRGZ_q67YOQ"],["The cumulative probability distribution function","6GVinzsZPvA"],["The normal distribution - introduction","QDhTWE63TsY"],["Mathematical proof that you do not exist","4aWnvHpnPTw"],["Determining normal probabilities on the Casio fx-CG50AU","yCua9CKXT0c"],["The inverse normal distribution on the Casio FX-CG50AU","0n44KNkDzS0"],["The inverse normal distribution on the TI-Nspire","rml5et6iHW4"],["A tricky normal distribution question","r86hnBJn0ps"],["Using z-scores to standardise and compare values","krBopVGckNY"],["The normal approximation to the binomial distribution","ViiMtoE07GY"]],"Topic 4: Sampling and proportions": [["Why is sample proportion interesting and important","aja3ANo8pjA"],["Sampling from a small population","niYT-nTjYxQ"],["Sampling from a large population","8JDTN38X6E0"],["Sample proportion - mean and standard deviation","SlQM-KdlvE8"],["Approximating the distribution of sample proportions (normal)","WxknDFFCbGs"]],"Topic 5: Interval estimates for proportions": [["Confidence intervals for population proportion","SU6VL5qWnwA"],["Finding a confidence interval on the Casio FXCG50 AU","2oAxT-1kDFU"],["Determining required sample size for a given margin of error","totlq2TMHHk"],["Binomial approximation to normal & sample proportion - one Q two ways","vXaYig52Bqg"]]},"Specialist Mathematics": {"Topic 1: Further complex numbers": [["De Moivre's theorem for raising a complex number to a power","E8L4zvHcvno"],["Factorising a cubic over C","O-IpmR-sv40"],["Conjugate root theorem","DNdrRZz2Amg"],["Factor theorem for factorising polynomials","wRHGaj9_lQk"],["Remainder theorem: worked examples, why it's useful & proof","bxe50pOWAFo"],["Roots of a complex number: De Moivre's theorem","QCAI1-G-heE"],["Roots of unity","XSEhSRZ0XBg"],["Factorising & solving quadratics over C","NhtcW11VW20"],["Complex numbers: polar form - fast recap incl. operations","jssIu-4Oqks"],["Complex numbers: very fast recap of i, operations, conjugates, Argand & modulus","FtjgRSuwbws"],["Proof of De Moivre's theorem","kqa9lpw4uak"],["Complex number proofs","zoSFmCyPAxY"]],"Topic 2: Mathematical induction & trig proofs (incl. multi-angle identities - moved here for 2026)": [["Why we need proof by mathematical induction","dqLhIEsAjg4"],["Summation notation or sigma notation","37_y9MtRKlA"],["Proof by mathematical induction: mathematical dominoes","RJEIS2Gu60U"],["Proof by induction - partial sums worked examples","wzYuSkbzN00"],["Proof by induction - divisibility proofs","diZ7RZ_bA3w"]],"Topic 3: Vectors in two and three dimensions": [["All Year 11 vectors in 30 minutes","Ck2uO-TL1BI"],["Intro to vectors in 3D","3Umqmbsxpc4"],["Vectors in 3D - sample questions","aZDFULLIZW0"],["Vector functions - introduction","lnsAqGxQZKk"],["Vector function basics - positions, times and distances","AXeL-zi6VvA"],["Convert a vector function to a Cartesian equation","HJuiOcyoAeM"],["Converting vector function to Cartesian equations using trig identities","LOZAKhsZFTI"],["Vector equations and finding collision points","-dvOV9dD4j4"],["Vector equations of lines","GHMpVpW3CDM"],["Converting vector equations to Cartesian & parametric equations","Mu0LTPiV3kQ"],["Vector cross product - introduction","3FMZ1EDJxOk"],["Vector product on your Casio","sPUZgZnIX7w"],["Cross product - area of shapes","CPm-sFEjCr4"],["Vector equation of a plane part 1","L_W38Q7IDZU"],["Vector equations of planes part 2","0Xz4TiMmbyY"],["Equation of spheres in Cartesian and vector form","n-JHumpj41E"]],"Topic 4: Vector calculus": [["Vector calculus - differentiation worked examples","uy0Ej5ByeWw"],["Vector calculus - anti-differentiation worked example","4P0EN5_OnsI"],["Vector calculus - displacement, velocity, acceleration","mtvL6Aczldc"],["Vector calculus - motion in a straight line","xtQ4GHBf3Bc"],["Projectile motion: the equations (acceleration, velocity, displacement)","l7RXaR7M5EA"],["Projectile motion: all the kinds of questions and how to solve them","NRDset7XWHQ"],["Uniform circular motion: a graphical vector understanding","zUKft-lVA9s"],["Uniform circular motion - worked example","ab0YmwPgT5Q"]],"Topic 5: Further matrices": [["Matrix algebra part 1","50yNz_ZV7Ck"],["Matrix algebra - simultaneous equations","1Z3Y1Y0NWdE"],["Geometric interpretation of systems of linear equations in 2 & 3D","2q0HMHY-2iM"],["Gaussian elimination part 1","tyoXqvmJB0g"],["Gaussian elimination part 2 - systems with lines as solutions","jfXZ2pS7qu8"],["Gaussian elimination part 3 - systems with no solution","iHW_WR5I4ec"],["Gaussian elimination part 4 - plane intersection","knZYisDZqM8"],["Gaussian elimination on the Casio FX-CG50AU","XrSZYk6mIwA"],["Leslie matrices - what's really going on?","qJ9_y1hO3QU"],["Leslie matrices for population age distribution modelling","I5WM2wdjr1M"],["Dominance matrices from start to finish","92-jFqNOS_o"],["Dominance matrices as a mathematical model","xoq8oaBkc_w"]],"Topic 1: Integration techniques": [["Inverse trig functions","iBqA-ijawuI"],["Derivatives of inverse trig functions","m5bAPWAMpZo"],["Integrals resulting in inverse trig","XLjZ2u8-41E"],["Proofs of derivatives of inverse trigonometric functions","i-Mbkz4tDhU"],["Integration by substitution - introduction","1gh9ji_RinE"],["Integration by substitution - worked examples part 1","GDwwnGkoNf4"],["Integration by substitution - worked examples part 2","ynsqiOoff7M"],["Integration by linear substitution","cgmK38bqf3E"],["Definite integral & u-substitution: one weird trick","hwL0PjtpLQ8"],["Using trig identities for integration","cVI-LUgTka0"],["Partial fractions","0yxSiQ8ekhw"],["Integration with partial fractions","woVBFljzSts"],["Integration by parts","zdK40q8HGcY"],["Integration by parts: choosing u and v'","JYh2N-k9PnI"],["Integration by parts - e^x sin x","HywbGymc3sM"],["Integrals resulting in natural log","RuD0-jGTRss"],["Using partial fractions for integration","gVhn_Nqo_5U"],["Integration by parts - complete","zdbHq2ddfwk"]],"Topic 2: Applications of integral calculus": [["Volumes of solids of revolution - introduction","NL6Sn5x9z0k"],["Volume of solids of revolution: between 2 curves","jMgoIGd7w14"],["Volumes of solids of revolution: around the y-axis","zJT_veF6hNY"],["Simpson's rule: worked example & Casio calculator use","7ifJn5ZkpFs"],["Simpson's rule questions","U9yOtNctqWs"],["Exponential probability density function: waiting for stuff","VkzCcuLQrR8"]],"Topic 3: Rates of change & differential equations": [["Implicit differentiation","wnmC5k4Pip4"],["Solving differential equations","bu52AaoCe7U"],["Solving differential equations given in terms of f(y)","LYOlJiaEk5I"],["Separable differential equations","ON8fs6J2OLc"],["Related rates: introduction and worked examples","cLLeWT08hXg"],["Related rates - parametric equations","pRK7qg5zups"],["Differential equations with related rates","7mckbczyFe4"],["Isaac Newton & my cup of coffee: differential equations applications","UwZp5dzphkg"],["Introduction to slope fields for differential equations","VWKJMrJ-4-8"]],"Topic 4: Modelling motion": [["Displacement, velocity, acceleration etc.","nWBMUnOUwJ8"],["Differential equations v=f(x) and a=f(v)","_CxtHVK9_9I"],["Alternative equations for acceleration","dcAU7xFanPs"],["Resultant vectors in preparation for forces","nEXv_hrRHPE"],["Momentum and force","3L0KidELhBE"],["Variable forces","bROoODsWS8c"],["Simple harmonic motion","4LaGoyeD8hE"]],"Topic 5: Statistical inference": [["Exploring sample means","1HC4ge9sTKc"],["The distribution of a sample mean for a normal random variable","IW-CEh8k1B8"],["The distribution of the sample mean for other random variables","BEewSIcxZQI"],["Confidence intervals for the population mean","Toff3tjVTjA"],["Confidence intervals - determining sample size for margin of error","GQjjC8aWbzA"]]}};
+
+function lkey(unit, topic){ return unit + " :: " + topic; }
+// Caps how many video links show inline in Today's Focus (the full list is on the Tracker page)
+// so a topic with 20+ videos doesn't swamp the daily card.
+const VIDEO_INLINE_CAP = 4;
+function videoLinksHtml(subject, topic){
+  const vids = (VIDEO_LINKS[subject] && VIDEO_LINKS[subject][topic]) || [];
+  if(!vids.length) return "";
+  const shown = vids.slice(0, VIDEO_INLINE_CAP);
+  const extra = vids.length - shown.length;
+  return `<div class="video-links"><span class="vlabel">&#9654; ${vids.length} video${vids.length===1?'':'s'} (Joel Speranza / Maths Videos Australia):</span> ` +
+    shown.map(([title,id])=>`<a href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">${title}</a>`).join(', ') +
+    (extra>0 ? ` <span style="color:var(--dim2);">&middot; +${extra} more on the Tracker page</span>` : "") +
+    `</div>`;
+}
+// Picks 2 lessons (one per session) for a given topic-visit, advancing 2 lessons further
+// into that topic's lesson list every time the topic comes up again on a later pass -
+// so repeat visits work through fresh subtopics/worked examples rather than repeating.
+function lessonsForVisit(subject, unit, topic, passNum){
+  const lessons = (LESSON_REFS[subject] && LESSON_REFS[subject][lkey(unit, topic)]) || null;
+  if(!lessons || !lessons.length) return [null, null];
+  const L = lessons.length;
+  const i1 = (passNum*2) % L;
+  const i2 = (passNum*2+1) % L;
+  return [lessons[i1], lessons[i2]];
+}
+// Formats a lesson object into the requested "Subtopic, Chapter, page, worked example/s"
+// tail, so callers just prepend the topic name to get the full "Topic, Subtopic, Chapter
+// number, page number, worked example/s" reference.
+function refTail(lessonObj){
+  if(!lessonObj) return "";
+  const m = lessonObj.lesson.match(/^(Ch\s*\S+)\s*·\s*(.+)$/);
+  const chapter = m ? m[1] : "";
+  const subtopic = m ? m[2] : lessonObj.lesson;
+  const we = lessonObj.we && lessonObj.we.length ? `, WE ${lessonObj.we.join(', ')}` : "";
+  const note = lessonObj.note ? ` [${lessonObj.note}]` : "";
+  return ` &mdash; ${subtopic}, ${chapter}, pp ${lessonObj.pages}${we}${note}`;
+}
+
+// Mirrors the exact topic-cycling logic used to build the Excel Daily Schedule:
+// each subject's weekday slot (content weeks only, before Week 5) works through its
+// exam-weight-ordered topic list (see getWeightedTopics above), wrapping around
+// (pass 2 = practice, pass 3+ = past-paper style).
+function topicsUpTo(targetDate){
+  const counts = {}; Object.keys(TOPICS).forEach(s=>counts[s]=0);
+  const result = {};
+  let weekdayIdx = 0; // increments once per Mon-Sat content day processed (Sunday excluded)
+  for(let d = new Date(START); d <= targetDate; d.setDate(d.getDate()+1)){
+    if(d >= WEEK5_START) break; // no topic cycling in week 5 / exam period
+    const wd = d.getDay();
+    if(wd===0) continue; // Sunday is the only fully protected rest day now
+    const sameDay = iso(d) === iso(targetDate);
+    const slotSubjects = [...BIG3, weightedSmallSubject(weekdayIdx)];
+    slotSubjects.forEach(s=>{
+      const list = getWeightedTopics(s);
+      const i = counts[s];
+      const [unit, topic, ref] = list[i % list.length];
+      const passNum = Math.floor(i / list.length);
+      if(sameDay) result[s] = {unit, topic, passNum, ref};
+      counts[s]++;
+    });
+    weekdayIdx++;
+  }
+  return result;
+}
+function passLabel(n){
+  if(n===0) return "content review";
+  if(n===1) return "practice questions";
+  return "timed past-paper questions";
+}
+
+function iso(d){ return d.toISOString().slice(0,10); }
+// Local-calendar-date key (not UTC-shifted like iso()) - needed when matching against
+// literal date strings from a real-world timetable (e.g. EXAM_DATE_SUBJECT), since iso()'s
+// UTC conversion can roll the date back a day in positive-offset timezones like Australia.
+function localDateKey(d){ const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
+function dayDiff(a,b){ return Math.round((b-a)/86400000); }
+function fmtDay(d){ return d.toLocaleDateString('en-AU',{weekday:'short', day:'numeric', month:'short'}); }
+
+const WEEK_BOUNDS = [
+  [new Date(2026,7,19), new Date(2026,7,23)],
+  [new Date(2026,7,24), new Date(2026,7,30)],
+  [new Date(2026,7,31), new Date(2026,8,6)],
+];
+function weekNumFor(d){
+  for(let i=0;i<WEEK_BOUNDS.length;i++){
+    if(d >= WEEK_BOUNDS[i][0] && d <= WEEK_BOUNDS[i][1]) return i+1;
+  }
+  return d < WEEK_BOUNDS[0][0] ? 1 : WEEK_BOUNDS.length;
+}
+
+// ---- Spaced / interleaved retrieval helpers ----
+// Retrieval 1: the topic this *same* subject covered last time it met (in-subject spacing).
+function priorTopicForSubject(s, d){
+  const t = topicsUpTo(d)[s];
+  if(!t) return null;
+  const list = getWeightedTopics(s);
+  const idx = list.findIndex(([u,tp])=>tp===t.topic);
+  if(idx<0) return null;
+  if(t.passNum===0 && idx===0) return null; // this is the very first session for this subject - nothing to retrieve yet
+  const prevIdx = (idx-1+list.length)%list.length;
+  const prevUnit = list[prevIdx][0], prevTopic = list[prevIdx][1];
+  const lessons = (LESSON_REFS[s] && LESSON_REFS[s][lkey(prevUnit, prevTopic)]) || null;
+  const lessonRef = lessons && lessons.length ? lessons[0] : null;
+  return {unit:prevUnit, topic:prevTopic, ref:list[prevIdx][2], lessonRef};
+}
+// Retrieval 2: whatever a *different* subject covered on the previous study day (interleaving).
+function yesterdaySubjectTopic(d){
+  let prev = new Date(d); prev.setDate(prev.getDate()-1);
+  for(let i=0;i<6;i++){
+    if(prev>=START && prev<WEEK5_START && prev.getDay()!==0){
+      const prevTopics = topicsUpTo(prev);
+      // prefer the "small" subject studied that day - guaranteed different from today's two
+      // big-subject slots, so this is genuine cross-category interleaving.
+      const found = SMALL3.map(s=> prevTopics[s] ? {subject:s, unit:prevTopics[s].unit, topic:prevTopics[s].topic} : null).find(Boolean);
+      if(found) return found;
+    }
+    prev.setDate(prev.getDate()-1);
+  }
+  return null;
+}
+
+// Splits a topic's study into three focused sessions (mirrors the guide's
+// Session 1 / Session 2 / Session 3 structure) rather than one flat list.
+function sessionsForPass(pnum, topicLabel){
+  if(pnum===0) return {
+    s1:[`Braindump &mdash; write everything you remember about '${topicLabel}' before checking notes`, "Check against notes/slides &mdash; fill gaps in a different colour"],
+    s2:[`Practice 2&ndash;3 questions on '${topicLabel}', unassisted`, "Mark & correct &mdash; note down error patterns"],
+    s3:[`Flashcards for new formulas/definitions/quotes from '${topicLabel}'`, "Update Dot-Point Tracker confidence colour"]
+  };
+  if(pnum===1) return {
+    s1:[`Review flashcards for '${topicLabel}' from last pass`],
+    s2:[`Practice questions on '${topicLabel}' &mdash; deliberately vary the angle/application`],
+    s3:["Mark & correct, then update Dot-Point Tracker"]
+  };
+  return {
+    s1:[`Timed past-paper style questions on '${topicLabel}'`],
+    s2:["Mark against the QCAA marking guide"],
+    s3:["Log result & reflect in Exam Planner", "Update Dot-Point Tracker"]
+  };
+}
+function sessionsForPassHalf(pnum, topicLabel){
+  if(pnum===0) return { s1:[`Braindump on '${topicLabel}', then check against notes`], s2:[`2&ndash;3 practice questions on '${topicLabel}', mark & update tracker`] };
+  if(pnum===1) return { s1:[`Review flashcards for '${topicLabel}'`], s2:[`Practice questions on '${topicLabel}', mark & update tracker`] };
+  return { s1:[`Timed past-paper section on '${topicLabel}'`], s2:["Mark & log in Exam Planner"] };
+}
+// Same as sessionsForPassHalf but session 1 and session 2 each cite a specific lesson/chapter
+// reference (subtopic, chapter, page, worked example numbers) instead of the bare topic name,
+// so every task says exactly what to open and work through.
+function sessionsForPassHalfRef(pnum, topic, lessonA, lessonB){
+  const labelA = topic + refTail(lessonA), labelB = topic + refTail(lessonB);
+  if(pnum===0) return { s1:[`Braindump on '${labelA}', then check against notes`], s2:[`2&ndash;3 practice questions on '${labelB}', mark & update tracker`] };
+  if(pnum===1) return { s1:[`Review flashcards for '${labelA}'`], s2:[`Practice questions on '${labelB}', mark & update tracker`] };
+  return { s1:[`Timed past-paper section on '${labelA}'`], s2:["Mark & log in Exam Planner"] };
+}
+
+// No confirmed per-subject exam dates exist yet for the mock exam window itself (7-17 Sep),
+// so - rather than leaving every day in that window as pure rest - each weekday still treats
+// one subject (or two, on Friday) as "likely up next" using the same Mon-Literature/
+// Tue-Physics/Wed-Methods/Thu-Specialist/Fri-PE&Music pattern as Week 5, and keeps that one
+// light (flashcards + rest only). Every OTHER subject gets one bonus/optional revision session,
+// continuing to cycle through its exam-weight-ordered topic list so the extra time is spent on
+// genuinely useful content rather than nothing. If real per-subject exam dates come through,
+// this can be swapped for an exact rest-day-per-subject schedule.
+function examWeekdayIndex(d){
+  let idx = 0;
+  for(let c = new Date(EXAM_START); c < d; c.setDate(c.getDate()+1)){
+    if(c.getDay()!==0 && c.getDay()!==6) idx++;
+  }
+  return idx;
+}
+function examPeriodTopic(s, idx){
+  const list = getWeightedTopics(s);
+  const i = idx % list.length;
+  const passNum = Math.floor(idx / list.length);
+  const [unit, topic, ref] = list[i];
+  return {unit, topic, ref, passNum};
+}
+
+function dayPlan(d){
+  const wd = d.getDay(); // 0=Sun..6=Sat
+  const isExam = d >= EXAM_START && d <= END;
+  const isWeekend = wd===0 || wd===6;
+  const isWeek5 = d >= WEEK5_START && d < EXAM_START;
+  const weekNum = weekNumFor(d);
+
+  if(isExam){
+    if(wd===0 || wd===6){
+      return {phase:"Exam period", blocks:[{subject:"Rest day", color:"#4ade80",
+        items:["No scheduled study &mdash; rest and recharge","Light flashcard skim only if you want it"]}]};
+    }
+    const examSubjectToday = EXAM_DATE_SUBJECT[localDateKey(d)];
+    const restSubjects = examSubjectToday ? [examSubjectToday] : [];
+    const idx = examWeekdayIndex(d);
+    const blocks = [];
+    restSubjects.forEach(s=>{
+      blocks.push({subject:s, color:SUBJECTS[s].color, session:"Exam day",
+        items:["Flashcard / formula recap only - no new content","Confirm exam time & room, then rest"]});
+    });
+    Object.keys(SUBJECTS).filter(s=>!restSubjects.includes(s)).forEach(s=>{
+      const et = examPeriodTopic(s, idx);
+      const [lessonA] = lessonsForVisit(s, et.unit, et.topic, et.passNum);
+      const tail = lessonA ? refTail(lessonA) : (et.ref ? ` &mdash; ${et.ref}` : "");
+      blocks.push({subject:s, color:SUBJECTS[s].color, unit:et.unit, topic:et.topic, ref: lessonA?refTail(lessonA).replace(/^ &mdash; /,''):et.ref, session:"Extra study (optional)",
+        items:[`Bonus revision &mdash; '${et.topic}${tail}'`]});
+    });
+    return {phase: restSubjects.length ? "Exam period - extra study" : "Exam period - revision", blocks};
+  }
+  if(wd===6 && isWeek5){
+    return {phase:`Week ${weekNum} - past papers`, blocks:[{subject:"Weakest subject this week", color:"#4ade80",
+      items:["Check the rings above - pick the lowest %","Practice its toughest topics from this week","Update Dot-Point Tracker"]}]};
+  }
+  if(isWeekend && wd===0){
+    // Mirrors the guide's Weekly Completion Checklist template.
+    return {phase: isWeek5?`Week ${weekNum} - past papers`:"Weekly review", blocks:[{subject:"Weekly Completion Checklist", color:"#4ade80",
+      items:["Light review - flashcard skim across everything","Confirm homework is submitted","Update exam & assignments breakdown","Update syllabus traffic lights (Dot-Point Tracker)","Plan next week's study","Write down any clarifying questions for next week"]}]};
+  }
+  if(isWeek5 && WEEKDAY_SUBJECT[wd]){
+    const s = WEEKDAY_SUBJECT[wd];
+    return {phase:`Week ${weekNum} - past papers`, blocks:[{subject:s, color:SUBJECTS[s].color,
+      items:["Complete a full timed past paper","Mark against the QCAA marking guide","Log score & reflect in Exam Planner"]}]};
+  }
+  if(isWeek5 && wd===5){
+    return {phase:`Week ${weekNum} - past papers`, blocks:[
+      {subject:"Physical Education", color:SUBJECTS["Physical Education"].color, items:["Timed past-paper section","Mark & log in Exam Planner"]},
+      {subject:"Music", color:SUBJECTS["Music"].color, items:["Timed past-paper section (analysis)","Mark & log in Exam Planner"]}
+    ]};
+  }
+  if((wd>=1 && wd<=5) || (wd===6 && !isWeek5)){
+    // Every content-phase day (Mon-Sat, Sunday stays the rest day): all 3 big subjects
+    // (Physics/Methods/Specialist) get a slot, plus 1 small-subject slot chosen by the
+    // weighted rotation (see weightedSmallSubject above).
+    const dayTopics = topicsUpTo(d);
+    const idx = contentWeekdayIndex(d);
+    const small = weightedSmallSubject(idx);
+    const blocks = [];
+    let minPass = 99;
+    BIG3.forEach(s=>{
+      const t = dayTopics[s];
+      const topic = t ? t.topic : "this topic";
+      const unit = t ? t.unit : "";
+      const pnum = t ? t.passNum : 0;
+      minPass = Math.min(minPass, pnum);
+      const color = SUBJECTS[s].color;
+      const [lessonA, lessonB] = t ? lessonsForVisit(s, unit, topic, pnum) : [null, null];
+      const refA = lessonA ? refTail(lessonA).replace(/^ &mdash; /,'') : (t ? t.ref : null);
+      const si = sessionsForPassHalfRef(pnum, topic, lessonA, lessonB);
+      blocks.push({subject:s, color, unit, topic, ref:refA, session:"Session 1", items:si.s1});
+      blocks.push({subject:s, color, unit, topic, ref:refA, session:"Session 2", items:si.s2});
+      const r1 = priorTopicForSubject(s, d);
+      if(r1) blocks.push({subject:s, color, unit:r1.unit, topic:r1.topic, ref:r1.ref, session:"Retrieval", retrieval:true,
+        items:[`Quick recall &mdash; '${r1.topic}${refTail(r1.lessonRef)}'`]});
+    });
+    {
+      const t = dayTopics[small];
+      const topic = t ? t.topic : "this topic";
+      const unit = t ? t.unit : "";
+      const pnum = t ? t.passNum : 0;
+      const color = SUBJECTS[small].color;
+      const [lessonA, lessonB] = t ? lessonsForVisit(small, unit, topic, pnum) : [null, null];
+      const refA = lessonA ? refTail(lessonA).replace(/^ &mdash; /,'') : (t ? t.ref : null);
+      const si = sessionsForPassHalfRef(pnum, topic, lessonA, lessonB);
+      blocks.push({subject:small, color, unit, topic, ref:refA, session:"Session 1", items:si.s1});
+      blocks.push({subject:small, color, unit, topic, ref:refA, session:"Session 2", items:si.s2});
+    }
+    const y = yesterdaySubjectTopic(d);
+    if(y && ![...BIG3,small].includes(y.subject)) blocks.push({subject:y.subject, color:SUBJECTS[y.subject].color, unit:y.unit, topic:y.topic, session:"Retrieval", retrieval:true,
+      items:[`Interleaved recall &mdash; '${y.topic}' (${y.subject})`]});
+    return {phase:`Week ${weekNum} - ${passLabel(minPass===99?0:minPass)}`, blocks};
+  }
+  return {phase:"-", blocks:[]};
+}
+
+function storeKey(){ return "studydash_v2"; } // bumped from v1 so progress restarts at 0 for the 12 Aug plan
+function loadStore(){ try{ return JSON.parse(localStorage.getItem(storeKey())||"{}"); }catch(e){ return {}; } }
+function saveStore(s){ localStorage.setItem(storeKey(), JSON.stringify(s)); }
+
+function dayCompletion(d){
+  const plan = dayPlan(d);
+  const total = plan.blocks.reduce((n,b)=>n+b.items.length,0);
+  if(total===0) return {total:0, done:0};
+  const store = loadStore();
+  const arr = store[iso(d)] || [];
+  const done = arr.filter(Boolean).length;
+  return {total, done};
+}
+
+function toggleItem(dateIso, idx){
+  const store = loadStore();
+  if(!store[dateIso]) store[dateIso] = [];
+  store[dateIso][idx] = !store[dateIso][idx];
+  saveStore(store);
+}
+
+// consecutive fully-complete days ending yesterday or today; also returns the ISO
+// dates that make up the run so the heatmap can highlight the active streak.
+function computeStreak(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  let streak = 0;
+  const days = [];
+  let cursor = new Date(Math.min(today, END));
+  while(cursor >= START){
+    const c = dayCompletion(new Date(cursor));
+    if(c.total>0 && c.done===c.total){ streak++; days.push(iso(cursor)); cursor.setDate(cursor.getDate()-1); }
+    else break;
+  }
+  return {streak, days};
+}
+
+// ---- animated number count-up ----
+function animateValue(el, to, suffix){
+  suffix = suffix || "";
+  const from = 0;
+  const dur = 650;
+  const start = performance.now();
+  function step(now){
+    const p = Math.min(1, (now-start)/dur);
+    const eased = 1 - Math.pow(1-p, 3);
+    const val = Math.round(from + (to-from)*eased);
+    el.innerHTML = suffix ? `${val}<span>${suffix}</span>` : `${val}`;
+    if(p<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// ---- Toasts & milestone celebrations ----
+function showToast(title, body, color){
+  const stack = document.getElementById('toastStack');
+  if(!stack) return;
+  const t = document.createElement('div');
+  t.className = 'toast';
+  if(color) t.style.borderLeftColor = color;
+  t.innerHTML = `<div class="t-title">${title}</div><div class="t-body">${body}</div>`;
+  stack.appendChild(t);
+  setTimeout(()=>{
+    t.classList.add('out');
+    setTimeout(()=>t.remove(), 320);
+  }, 4200);
+}
+function checkMilestone(subject, pct, color){
+  const key = 'studydash_milestones_v2';
+  let store = {}; try{ store = JSON.parse(localStorage.getItem(key)||'{}'); }catch(e){}
+  const thresholds = [25,50,75,100];
+  const prevBest = store[subject] || 0;
+  let newBest = prevBest;
+  thresholds.forEach(th=>{
+    if(pct>=th && prevBest<th){
+      newBest = Math.max(newBest, th);
+      const title = th===100 ? "Subject complete" : `${th}% milestone`;
+      const body = th===100 ? `${subject} is fully covered so far &mdash; keep the reps up.` : `${subject} has crossed ${th}% coverage.`;
+      showToast(`&#127881; ${title}`, body, color);
+    }
+  });
+  if(newBest !== prevBest){ store[subject] = newBest; localStorage.setItem(key, JSON.stringify(store)); }
+}
+function updateStreakRisk(streak){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const banner = document.getElementById('streakRisk');
+  if(!banner) return;
+  if(today < START || today > END){ banner.classList.remove('show'); return; }
+  const c = dayCompletion(today);
+  const todayDone = c.total>0 && c.done===c.total;
+  const show = streak>0 && !todayDone && c.total>0;
+  banner.classList.toggle('show', show);
+  if(show) document.getElementById('streakRiskDays').textContent = streak;
+}
+
+// ---- Today panel ----
+function renderToday(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const clamped = today < START ? START : (today > END ? END : today);
+  document.getElementById('todayLine').textContent = today.toLocaleDateString('en-AU',{weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  const plan = dayPlan(clamped);
+  document.getElementById('phaseLabel').textContent = plan.phase;
+
+  const badgeWrap = document.getElementById('todayBadges');
+  const seenSubj = new Set();
+  badgeWrap.innerHTML = plan.blocks.filter(b=>{ if(seenSubj.has(b.subject)) return false; seenSubj.add(b.subject); return true; }).map(b=>
+    `<span class="badge" style="background:${b.color}22; color:${b.color};"><span class="dot" style="background:${b.color};"></span>${b.subject}</span>`
+  ).join(' ');
+
+  const topicEl = document.getElementById('todayTopic');
+  if(today < START){
+    topicEl.textContent = `Your plan starts ${fmtDay(START)}.`;
+  } else if(today > END){
+    topicEl.textContent = `Prep window ended ${fmtDay(END)}.`;
+  } else {
+    const withTopic = plan.blocks.filter(b=>b.topic && !b.retrieval && (b.session==="Session 1"));
+    if(withTopic.length){
+      topicEl.innerHTML = withTopic.map(b=>
+        `<div style="margin-bottom:4px;"><strong style="color:${b.color};">${b.subject}:</strong> ${b.topic}${b.unit? ` <span style="color:var(--dim2);">(${b.unit})</span>`:""}${b.ref? `<br><span style="color:var(--dim2); font-size:11.5px;">&#128214; ${b.ref}</span>`:""}${videoLinksHtml(b.subject, b.topic)}</div>`
+      ).join('');
+    } else {
+      topicEl.textContent = "Tick items off as you complete them today.";
+    }
+  }
+
+  const list = document.getElementById('todayChecklist');
+  list.innerHTML = "";
+  const dISO = iso(clamped);
+  const store = loadStore();
+  let idx = 0;
+  let lastSession = null;
+  plan.blocks.forEach(b=>{
+    if(b.session && b.session!==lastSession){
+      const head = document.createElement('div');
+      head.className = "sess-head" + (b.retrieval ? " retrieval" : "");
+      head.innerHTML = `<span>${b.session}</span><span class="line"></span>`;
+      list.appendChild(head);
+      lastSession = b.session;
+    }
+    b.items.forEach(label=>{
+      const done = !!(store[dISO] && store[dISO][idx]);
+      const row = document.createElement('div');
+      row.className = "item" + (done?" done":"") + (b.retrieval?" retrieval":"");
+      row.innerHTML = `<span class="box"></span><span class="lab">${label}</span><span class="grp">${b.subject}</span>`;
+      row.dataset.idx = idx;
+      row.addEventListener('click', ()=>{
+        const willBeDone = !row.classList.contains('done');
+        row.classList.toggle('done', willBeDone);
+        row.querySelector('.box').classList.add('pop');
+        toggleItem(dISO, row.dataset.idx*1);
+        setTimeout(()=>{ renderKpis(); renderRings(); renderCalendar(); renderSyllabus(); updateCelebrate(plan, dISO); }, 180);
+      });
+      list.appendChild(row);
+      idx++;
+    });
+  });
+  updateCelebrate(plan, dISO);
+}
+
+function updateCelebrate(plan, dISO){
+  const total = plan.blocks.reduce((n,b)=>n+b.items.length,0);
+  const store = loadStore();
+  const arr = store[dISO] || [];
+  const done = arr.filter(Boolean).length;
+  const card = document.getElementById('todayCard');
+  const banner = document.getElementById('celebrate');
+  const isComplete = total>0 && done===total;
+  card.classList.toggle('complete', isComplete);
+  banner.classList.toggle('show', isComplete);
+}
+
+// ---- KPIs ----
+function renderKpis(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const daysLeft = Math.max(0, dayDiff(today, EXAM_START));
+  animateValue(document.getElementById('kpiDays'), daysLeft);
+  document.getElementById('countdownPill').textContent = daysLeft>0 ? `${daysLeft} days to go` : "Mocks are on";
+
+  let totalAll=0, doneAll=0;
+  for(let d=new Date(START); d<=END; d.setDate(d.getDate()+1)){
+    const c = dayCompletion(new Date(d));
+    totalAll += c.total; doneAll += c.done;
+  }
+  animateValue(document.getElementById('kpiOverall'), totalAll ? Math.round(100*doneAll/totalAll) : 0, "%");
+
+  // streak: consecutive fully-complete days ending yesterday or today
+  const streak = computeStreak().streak;
+  const flame = streak>0 ? "&#128293;" : "";
+  document.getElementById('kpiStreak').innerHTML = `${flame}${streak}<span> day${streak===1?"":"s"}</span>`;
+  document.getElementById('streakKpi').classList.toggle('streak-hot', streak>0);
+
+  const bestKey = 'studydash_beststreak_v2';
+  let best = parseInt(localStorage.getItem(bestKey)||'0', 10);
+  if(streak > best){ best = streak; localStorage.setItem(bestKey, String(best)); }
+  const bestEl = document.getElementById('kpiStreakBest');
+  if(streak>0 && streak>=best) bestEl.textContent = "Personal best!";
+  else if(best>0) bestEl.textContent = `Best: ${best} day${best===1?"":"s"}`;
+  else bestEl.textContent = "";
+
+  updateStreakRisk(streak);
+}
+
+// ---- Rings (this week by subject) ----
+function weekBoundsFor(date){
+  const wn = weekNumFor(date) - 1;
+  const [s,e] = WEEK_BOUNDS[wn];
+  return [new Date(s), new Date(e) > END ? new Date(END) : new Date(e)];
+}
+
+function renderRings(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const clamped = today < START ? START : (today > END ? END : today);
+  const [wStart, wEnd] = weekBoundsFor(clamped);
+  const totals = {}; Object.keys(SUBJECTS).forEach(s=>totals[s]={total:0,done:0});
+  const store = loadStore();
+
+  for(let d=new Date(wStart); d<=wEnd; d.setDate(d.getDate()+1)){
+    const plan = dayPlan(new Date(d));
+    let offset = 0;
+    plan.blocks.forEach(b=>{
+      const n = b.items.length;
+      if(totals[b.subject]){
+        const arr = store[iso(d)] || [];
+        const doneHere = arr.slice(offset, offset+n).filter(Boolean).length;
+        totals[b.subject].total += n;
+        totals[b.subject].done += doneHere;
+      }
+      offset += n;
+    });
+  }
+
+  const grid = document.getElementById('ringsGrid');
+  grid.innerHTML = "";
+  Object.keys(SUBJECTS).forEach((s,i)=>{
+    const t = totals[s];
+    const pct = t.total ? Math.round(100*t.done/t.total) : 0;
+    const color = SUBJECTS[s].color;
+    const div = document.createElement('div');
+    div.className = "ring-item";
+    div.style.animationDelay = (i*0.06)+"s";
+    div.innerHTML = `
+      <div class="ring" style="background:conic-gradient(${color} ${pct*3.6}deg, var(--card2) 0deg);">
+        <div class="hole">${pct}%</div>
+      </div>
+      <div class="ring-name">${s}</div>`;
+    grid.appendChild(div);
+  });
+}
+
+// ---- Syllabus progress (overall, whole prep window to date) ----
+const openSubjects = new Set();
+function computeSyllabusProgress(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const limit = today > END ? END : (today < START ? START : today);
+  const store = loadStore();
+  const bySubject = {}; Object.keys(SUBJECTS).forEach(s=>bySubject[s]={done:0,total:0});
+  const byTopic = {};
+
+  for(let d=new Date(START); d<=limit; d.setDate(d.getDate()+1)){
+    const dd = new Date(d);
+    const plan = dayPlan(dd);
+    const arr = store[iso(dd)] || [];
+    let offset = 0;
+    plan.blocks.forEach(b=>{
+      const n = b.items.length;
+      const doneHere = arr.slice(offset, offset+n).filter(Boolean).length;
+      offset += n;
+      if(bySubject[b.subject]){ bySubject[b.subject].done += doneHere; bySubject[b.subject].total += n; }
+      if(b.topic && !b.retrieval && TOPICS[b.subject]){
+        const tKey = b.subject+"|"+b.unit+"|"+b.topic;
+        if(!byTopic[tKey]) byTopic[tKey] = {subject:b.subject, unit:b.unit, topic:b.topic, done:0, total:0};
+        byTopic[tKey].done += doneHere; byTopic[tKey].total += n;
+      }
+    });
+  }
+  return {bySubject, byTopic};
+}
+function unitsForSubject(s){
+  const seen = [];
+  TOPICS[s].forEach(([u])=>{ if(!seen.includes(u)) seen.push(u); });
+  return seen;
+}
+function renderSyllabus(){
+  const {bySubject, byTopic} = computeSyllabusProgress();
+  const wrap = document.getElementById('syllabusGrid');
+  wrap.innerHTML = "";
+  Object.keys(SUBJECTS).forEach(s=>{
+    const color = SUBJECTS[s].color;
+    const sub = bySubject[s];
+    const subPct = sub.total ? Math.round(100*sub.done/sub.total) : 0;
+    if(sub.total>0) checkMilestone(s, subPct, color);
+
+    const row = document.createElement('div');
+    row.className = "subj-row" + (openSubjects.has(s) ? " open" : "");
+
+    const head = document.createElement('div');
+    head.className = "subj-row-head";
+    head.innerHTML = `<span class="chev">&#9656;</span>
+      <span class="name2" style="color:${color};">${s}</span>
+      <span class="bar-track"><span class="bar-fill" style="background:${color};"></span></span>
+      <span class="pct">${subPct}%</span>`;
+    head.addEventListener('click', ()=>{
+      if(openSubjects.has(s)) openSubjects.delete(s); else openSubjects.add(s);
+      row.classList.toggle('open');
+    });
+    row.appendChild(head);
+
+    const body = document.createElement('div');
+    body.className = "subj-row-body";
+    const units = unitsForSubject(s);
+    units.forEach(u=>{
+      const topics = TOPICS[s].filter(([uu])=>uu===u).map(([,t])=>t);
+      let uDone=0, uTotal=0;
+      topics.forEach(t=>{ const k=s+"|"+u+"|"+t; const rec=byTopic[k]; if(rec){ uDone+=rec.done; uTotal+=rec.total; } });
+      const uPct = uTotal ? Math.round(100*uDone/uTotal) : 0;
+      const ublock = document.createElement('div');
+      ublock.className = "unit-block";
+      ublock.innerHTML = `<div class="unit-head">${u}</div>
+        <div class="unit-block-bar"><span class="bar-track"><span class="bar-fill" style="background:${color};opacity:.75;"></span></span><span class="pct">${uPct}%</span></div>`;
+      const barFillUnit = ublock.querySelector('.unit-block-bar .bar-fill');
+      requestAnimationFrame(()=>{ barFillUnit.style.width = uPct+"%"; });
+
+      topics.forEach(t=>{
+        const k = s+"|"+u+"|"+t;
+        const rec = byTopic[k];
+        const tPct = rec && rec.total ? Math.round(100*rec.done/rec.total) : 0;
+        const trow = document.createElement('div');
+        trow.className = "topic-row";
+        trow.innerHTML = `<span class="tname">${t}</span><span class="bar-track"><span class="bar-fill" style="background:${color};"></span></span><span class="pct">${tPct}%</span>`;
+        const bf = trow.querySelector('.bar-fill');
+        requestAnimationFrame(()=>{ bf.style.width = tPct+"%"; });
+        ublock.appendChild(trow);
+      });
+      body.appendChild(ublock);
+    });
+    row.appendChild(body);
+    wrap.appendChild(row);
+
+    const headFill = head.querySelector('.bar-fill');
+    requestAnimationFrame(()=>{ headFill.style.width = subPct+"%"; });
+  });
+}
+
+// ---- Calendar heatmap ----
+// Row labels match the SAME week numbers shown in Today's Focus (weekNumFor), instead of a
+// plain incrementing row counter - previously the calendar said "Wk 4" for the exact week that
+// Today's Focus called "Week 5 - past papers", which was confusing. Exam-period rows get their
+// own "Exam" label rather than reusing the last content week's number.
+function calRowLabel(monday){
+  if(monday >= EXAM_START) return "Exam";
+  return "Wk " + weekNumFor(monday);
+}
+function renderCalendar(){
+  const cal = document.getElementById('calGrid');
+  cal.innerHTML = "";
+  const head = document.createElement('div');
+  head.className = "cal-row";
+  head.innerHTML = `<div></div>` + ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(x=>`<div class="cal-head">${x}</div>`).join('');
+  cal.appendChild(head);
+
+  let gridStart = new Date(START);
+  gridStart.setDate(gridStart.getDate() - ((gridStart.getDay()+6)%7));
+  let gridEnd = new Date(END);
+  gridEnd.setDate(gridEnd.getDate() + (7 - ((gridEnd.getDay()+6)%7) - 1));
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const streakDays = new Set(computeStreak().days);
+  let cursor = new Date(gridStart);
+  while(cursor <= gridEnd){
+    const row = document.createElement('div');
+    row.className = "cal-row";
+    const label = document.createElement('div');
+    label.className = "cal-wk-label";
+    label.textContent = calRowLabel(new Date(cursor));
+    row.appendChild(label);
+    for(let i=0;i<7;i++){
+      const d = new Date(cursor);
+      const inRange = d>=START && d<=END;
+      const cell = document.createElement('div');
+      cell.className = "cal-cell" + (inRange?"":" faded");
+      if(inRange){
+        const plan = dayPlan(d);
+        const c = dayCompletion(d);
+        const isFuture = d > today;
+        if(plan.blocks.length){
+          const mainColor = plan.blocks[0].color;
+          const pct = c.total ? c.done/c.total : 0;
+          if(!isFuture && pct>0){
+            cell.style.background = mainColor;
+            cell.style.opacity = 0.35 + pct*0.65;
+          } else {
+            cell.style.border = `1px solid ${mainColor}`;
+            cell.style.background = "var(--card2)";
+          }
+        }
+        if(streakDays.has(iso(d))) cell.style.boxShadow = "0 0 0 2px #fb923c inset";
+        if(iso(d)===iso(today)) cell.style.boxShadow = "0 0 0 2px var(--accent) inset";
+        cell.title = fmtDay(d);
+        cell.textContent = d.getDate();
+      }
+      row.appendChild(cell);
+      cursor.setDate(cursor.getDate()+1);
+    }
+    cal.appendChild(row);
+  }
+
+  const legend = document.getElementById('calLegend');
+  legend.innerHTML = Object.keys(SUBJECTS).map(s=>
+    `<span><span class="dot" style="background:${SUBJECTS[s].color};"></span>${s}</span>`
+  ).join('') + `<span><span class="dot" style="background:var(--accent);"></span>Today</span>`
+    + `<span><span class="dot" style="background:transparent; border:2px solid #fb923c;"></span>Current streak</span>`;
+}
+
+// ---- Subject reference cards ----
+function renderSubjectCards(){
+  const wrap = document.getElementById('subjectCards');
+  wrap.innerHTML = Object.keys(SUBJECTS).map(s=>{
+    const info = SUBJECTS[s];
+    return `<div class="subj-card" style="--c:${info.color};">
+      <div class="name" style="color:${info.color};">${s}</div>
+      <div class="meta">${info.weight} weight<br>${info.note}</div>
+    </div>`;
+  }).join('');
+}
+
+// ---- Final countdown panel: day-by-day plan through mock exams, plus a visible
+// readout of the exam-frequency weighting (exam-insights.com QCAA data) that already
+// drives topic order in dayPlan/getWeightedTopics above - previously only baked into
+// the scheduling logic, never shown on the page itself.
+function renderCountdownPlan(){
+  const wrap = document.getElementById('countdownDays');
+  const freqWrap = document.getElementById('freqGrid');
+  if(!wrap || !freqWrap) return;
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  if(today > EXAM_START){
+    document.getElementById('countdownSub').textContent = "mocks are underway";
+    wrap.innerHTML = `<div style="color:var(--dim); font-size:12.5px; padding:6px 2px;">Mocks began ${fmtDay(EXAM_START)} &mdash; see the calendar below for the rest of the exam period.</div>`;
+    freqWrap.innerHTML = "";
+    return;
+  }
+
+  // Floor the display at 30 Aug regardless of START/today, per request - once that date
+  // passes it falls back to tracking "today" as normal, so the strip doesn't accumulate
+  // stale past days forever.
+  const COUNTDOWN_FLOOR = new Date(2026,7,30);
+  const rangeStart = new Date(Math.max(today.getTime(), COUNTDOWN_FLOOR.getTime(), START.getTime()));
+  document.getElementById('countdownSub').textContent = `${fmtDay(rangeStart)} → ${fmtDay(EXAM_START)}`;
+
+  const chips = [];
+  for(let c = new Date(rangeStart); c < EXAM_START; c.setDate(c.getDate()+1)) chips.push(new Date(c));
+  chips.push(new Date(EXAM_START));
+
+  wrap.innerHTML = "";
+  chips.forEach(d=>{
+    const isMock = localDateKey(d)===localDateKey(EXAM_START);
+    const chip = document.createElement('div');
+    chip.className = 'day-chip' + (iso(d)===iso(today)?' is-today':'') + (isMock?' is-mock':'');
+    let phaseText, badgesHtml;
+    if(isMock){
+      const examSub = EXAM_DATE_SUBJECT[localDateKey(d)];
+      phaseText = "Mocks begin";
+      badgesHtml = examSub ? `<span class="dc-badge" style="background:${SUBJECTS[examSub].color}22; color:${SUBJECTS[examSub].color};">${examSub} exam</span>` : "";
+    } else {
+      const plan = dayPlan(d);
+      phaseText = plan.phase;
+      const seen = new Set();
+      const subs = plan.blocks.filter(b=>{
+        if(!SUBJECTS[b.subject] || seen.has(b.subject)) return false;
+        seen.add(b.subject); return true;
+      });
+      if(subs.length){
+        badgesHtml = subs.map(b=>`<span class="dc-badge" style="background:${b.color}22; color:${b.color};">${b.subject}</span>`).join('');
+      } else {
+        // Special-case days that aren't tied to one fixed subject (see dayPlan): a
+        // generic "rest" badge would understate that these are still active study days.
+        const label0 = plan.blocks[0] ? plan.blocks[0].subject : "";
+        const special = label0==="Weakest subject this week" ? "Weakest subject"
+          : label0==="Weekly Completion Checklist" ? "Weekly review"
+          : "Rest / review";
+        badgesHtml = `<span class="dc-badge" style="background:var(--border); color:var(--dim);">${special}</span>`;
+      }
+    }
+    chip.innerHTML = `
+      <div class="dc-date">${d.toLocaleDateString('en-AU',{weekday:'short'})} <strong>${d.getDate()} ${d.toLocaleDateString('en-AU',{month:'short'})}</strong></div>
+      <div class="dc-phase">${phaseText}</div>
+      <div class="dc-badges">${badgesHtml}</div>`;
+    wrap.appendChild(chip);
+  });
+
+  // Exam-frequency insight columns - one per subject that has quantified topic-weight
+  // data (see TOPIC_WEIGHTS above). Bars are scaled relative to the single highest
+  // weight across all subjects, so the columns stay visually comparable.
+  freqWrap.innerHTML = "";
+  let maxW = 0;
+  Object.values(TOPIC_WEIGHTS).forEach(w=>Object.values(w).forEach(v=>{ if(v>maxW) maxW=v; }));
+  Object.keys(TOPIC_WEIGHTS).forEach(s=>{
+    const top = Object.entries(TOPIC_WEIGHTS[s]).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    const col = document.createElement('div');
+    col.className = 'freq-col';
+    col.innerHTML = `<h3 style="color:${SUBJECTS[s].color};">${s}</h3>` + top.map(([topic,pct])=>`
+      <div class="freq-item">
+        <div class="fi-top"><span class="fi-name">${topic.replace(/^Topic \d+: /,'')}</span><span class="fi-pct">${pct}%</span></div>
+        <div class="freq-bar-track"><span class="freq-bar-fill" style="width:${maxW?Math.round(pct/maxW*100):0}%; background:${SUBJECTS[s].color};"></span></div>
+      </div>`).join('');
+    freqWrap.appendChild(col);
+  });
+  const note = document.createElement('div');
+  note.className = 'freq-note';
+  note.innerHTML = `Literature, Physical Education &amp; Music aren't broken into a ranked exam-frequency table &mdash; they're essay/practical-response papers with no published per-topic question-frequency breakdown on Exam Insights. They're still prioritised in the daily plan by their exam weight (25% each) and a full-syllabus rotation, so every topic gets covered before mocks start.`;
+  freqWrap.appendChild(note);
+  const src = document.createElement('div');
+  src.className = 'freq-source';
+  src.textContent = "Source: exam-insights.com QCAA Historical Trends — % of 2020–2025 past-exam questions per topic. Same data already sets the topic order in each subject's daily plan above.";
+  freqWrap.appendChild(src);
+}
+
+renderToday();
+renderKpis();
+renderRings();
+renderSyllabus();
+renderCalendar();
+renderSubjectCards();
+renderCountdownPlan();
+</script>
+</body>
+</html>
