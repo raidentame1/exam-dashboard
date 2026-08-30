@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Physics &mdash; Mock exam prep</title>
+<style>
+:root{
+  --bg:#0a0e14; --card:#131a24; --card2:#1a2330; --card3:#212c3b; --border:#2a3444;
+  --text:#f0f4f9; --dim:#a9b4c4; --dim2:#79869a;
+  --accent:#4ade80; --accent-dim:rgba(74,222,128,.14);
+}
+*{box-sizing:border-box;}
+body{margin:0; background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; padding:32px 24px 60px;}
+.wrap{max-width:900px; margin:0 auto;}
+.navbar{display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; flex-wrap:wrap; gap:10px;}
+.brand{display:flex; align-items:center; gap:9px; font-weight:800; font-size:15px; letter-spacing:-.01em;}
+.brand .sq{width:9px; height:9px; border-radius:3px; background:var(--accent); box-shadow:0 0 10px rgba(74,222,128,.6);}
+.navlinks{display:flex; gap:6px; background:var(--card); border:1px solid var(--border); border-radius:11px; padding:4px;}
+.navlinks a{color:var(--dim); text-decoration:none; font-size:12.5px; font-weight:600; padding:8px 14px; border-radius:8px; transition:background .15s, color .15s;}
+.navlinks a:hover{color:var(--text); background:var(--card2);}
+.navlinks a.active{color:var(--bg); background:var(--accent);}
+.subjectnav{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:22px;}
+.subjectnav a{color:var(--dim); text-decoration:none; font-size:11.5px; font-weight:600; padding:6px 12px; border-radius:999px; border:1px solid var(--border); background:var(--card);}
+.subjectnav a.active{color:var(--bg); background:var(--c); border-color:var(--c);}
+.subjectnav a:hover{border-color:var(--dim2);}
+.hero{background:var(--card); border:1px solid var(--border); border-left:4px solid var(--c); border-radius:14px; padding:22px; margin-bottom:20px;}
+.hero h1{margin:0 0 6px; font-size:24px; letter-spacing:-.01em; color:var(--c);}
+.hero .meta{color:var(--dim); font-size:13px; line-height:1.6;}
+.hero .weight{display:inline-block; background:color-mix(in srgb, var(--c) 18%, transparent); color:var(--c); border-radius:999px; padding:3px 11px; font-size:11.5px; font-weight:700; margin-top:8px;}
+.freq{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px 20px; margin-bottom:20px;}
+.freq h2{font-size:13px; margin:0 0 12px; color:var(--dim); text-transform:uppercase; letter-spacing:.04em;}
+.freq-item{margin-bottom:9px;}
+.freq-item:last-child{margin-bottom:0;}
+.freq-top{display:flex; justify-content:space-between; gap:8px; font-size:12.5px; margin-bottom:4px;}
+.freq-top .fn{color:var(--text);}
+.freq-top .fp{color:var(--dim); font-weight:700;}
+.freq-bar-track{height:6px; background:var(--border); border-radius:99px; overflow:hidden;}
+.freq-bar-fill{height:100%; border-radius:99px; background:var(--c);}
+.unit{margin-bottom:20px;}
+.unit h2{font-size:14px; font-weight:700; color:var(--text); margin:0 0 10px; padding-bottom:8px; border-bottom:1px solid var(--border);}
+.topic{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:10px;}
+.topic h3{margin:0 0 4px; font-size:13.5px; color:var(--c);}
+.topic .pct{float:right; color:var(--dim2); font-size:11px; font-weight:700;}
+.lesson{padding:8px 0 8px 14px; border-left:2px solid var(--border); margin-top:8px; font-size:12.5px; color:var(--dim);}
+.lesson .ll{color:var(--text); line-height:1.5;}
+.lesson .meta2{color:var(--dim2); font-size:11.5px; margin-top:2px;}
+.video-links{font-size:11.5px; line-height:1.7; color:var(--dim); margin:8px 0 0;}
+.video-links .vlabel{font-weight:700; color:var(--dim2); text-transform:uppercase; letter-spacing:.03em; font-size:10px; display:block; margin-bottom:3px;}
+.video-links a{color:var(--accent); text-decoration:none;}
+.video-links a:hover{text-decoration:underline;}
+.subjects-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+.subj-card{background:var(--card); border:1px solid var(--border); border-left:4px solid var(--c); border-radius:12px; padding:16px; text-decoration:none; transition:transform .15s, border-color .15s; display:block;}
+.subj-card:hover{transform:translateY(-2px); border-color:var(--dim2);}
+.subj-card .name{font-size:14px; font-weight:700; color:var(--c); margin-bottom:6px;}
+.subj-card .meta{font-size:11.5px; color:var(--dim); line-height:1.5;}
+footer{color:var(--dim2); font-size:12px; text-align:center; margin-top:28px; line-height:1.6;}
+footer a{color:var(--accent);}
+@media(max-width:820px){ .subjects-grid{grid-template-columns:repeat(2,1fr);} }
+@media(max-width:520px){ .subjects-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap" style="--c:#5eb0ff;">
+<div class="navbar">
+    <div class="brand"><span class="sq"></span>Mock exam prep</div>
+    <div class="navlinks">
+      <a href="https://exam-dashboard-silk.vercel.app/">Dashboard</a>
+      <a href="https://mock-exam-tracker.vercel.app/">Tracker</a>
+      <a href="index.html" class="active">Subjects</a>
+      <a href="https://exam-planner-alpha.vercel.app/">Planner</a>
+    </div>
+  </div>
+<div class="subjectnav"><a href="literature.html">Literature</a><a href="physics.html" class="active" style="--c:#5eb0ff;">Physics</a><a href="mathematical-methods.html">Mathematical Methods</a><a href="specialist-mathematics.html">Specialist Mathematics</a><a href="physical-education.html">Physical Education</a><a href="music.html">Music</a></div>
+<div class="hero" style="--c:#5eb0ff;">
+  <h1>Physics</h1>
+  <div class="meta">2 papers - 5 min perusal, 90 min each. Calculator + formula book.</div>
+  <div class="weight">50% of final exam mark</div>
+</div>
+<div class="freq"><h2>Exam-frequency &mdash; % of 2020&ndash;2025 past-exam questions per topic</h2><div class="freq-item"><div class="freq-top"><span class="fn">Gravity and motion</span><span class="fp">33%</span></div><div class="freq-bar-track"><span class="freq-bar-fill" style="width:100%;"></span></div></div><div class="freq-item"><div class="freq-top"><span class="fn">Electromagnetism</span><span class="fp">25%</span></div><div class="freq-bar-track"><span class="freq-bar-fill" style="width:76%;"></span></div></div><div class="freq-item"><div class="freq-top"><span class="fn">Quantum theory</span><span class="fp">18%</span></div><div class="freq-bar-track"><span class="freq-bar-fill" style="width:55%;"></span></div></div><div class="freq-item"><div class="freq-top"><span class="fn">The Standard Model</span><span class="fp">13%</span></div><div class="freq-bar-track"><span class="freq-bar-fill" style="width:39%;"></span></div></div><div class="freq-item"><div class="freq-top"><span class="fn">Special relativity</span><span class="fp">12%</span></div><div class="freq-bar-track"><span class="freq-bar-fill" style="width:36%;"></span></div></div></div>
+<div class="unit"><h2>Unit 3: Gravity and electromagnetism</h2><div class="topic"><h3>Topic 1: Gravity and motion</h3><div class="lesson"><div class="ll">1.1 Representing vectors & resolving into perpendicular components</div><div class="meta2">Ch 1 &middot; pp 36-42</div></div><div class="lesson"><div class="ll">1.2 Combining vectors / projectile motion basics (horizontal & angled projection)</div><div class="meta2">Ch 1 &middot; pp 43-49, WE 1.2A, 1.2C, 1.2D</div></div><div class="lesson"><div class="ll">1.3 Horizontal & vertical velocity components; independence of components</div><div class="meta2">Ch 1 &middot; pp 50-65, WE 1.3C</div></div><div class="lesson"><div class="ll">1.4 Forces on an object (weight, normal, applied, friction, tension) — leads into inclined planes</div><div class="meta2">Ch 1 &middot; pp 66-68</div></div><div class="lesson"><div class="ll">2.1 Forces on an inclined plane: weight, normal force, friction, tension</div><div class="meta2">Ch 2 &middot; pp 71-74</div></div><div class="lesson"><div class="ll">2.2 Free-body diagrams and forces on an inclined plane (parallel/perpendicular components)</div><div class="meta2">Ch 2 &middot; pp 75-84, WE 2.2D, 2.2E</div></div><div class="lesson"><div class="ll">2.3 Net force on an inclined plane using vector analysis</div><div class="meta2">Ch 2 &middot; pp 85-96</div></div><div class="lesson"><div class="ll">3.1 Uniform circular motion — force perpendicular to velocity</div><div class="meta2">Ch 3 &middot; pp 99-102</div></div><div class="lesson"><div class="ll">3.2 Average speed and period in circular motion</div><div class="meta2">Ch 3 &middot; pp 103-107</div></div><div class="lesson"><div class="ll">3.3 Centripetal acceleration and centripetal force; solving circular motion problems</div><div class="meta2">Ch 3 &middot; pp 108-118, WE 3.3B, 3.3D</div></div><div class="lesson"><div class="ll">4.1 What gravity is; gravitational force between masses</div><div class="meta2">Ch 4 &middot; pp 121-122</div></div><div class="lesson"><div class="ll">4.2 Newton's Law of Universal Gravitation (solving problems)</div><div class="meta2">Ch 4 &middot; pp 123-129, WE +2 more (OCR unclear)</div></div><div class="lesson"><div class="ll">4.3 Gravitational fields and gravitational field strength</div><div class="meta2">Ch 4 &middot; pp 130-137, WE +1 more (OCR unclear)</div></div><div class="lesson"><div class="ll">5.1 Kepler's Laws of planetary motion; deriving Kepler's third law</div><div class="meta2">Ch 5 &middot; pp 140-145, WE +2 more (OCR unclear)</div></div><div class="lesson"><div class="ll">5.2 Contributions of scientists (Newton, Kepler, du Chatelet, Katherine Johnson); gravity waves/LIGO international collaboration</div><div class="meta2">Ch 5 &middot; pp 146-147</div></div><div class="lesson"><div class="ll">5.3 Satellite orbits — positioning of satellites, space debris management</div><div class="meta2">Ch 5 &middot; pp 148-153</div></div></div><div class="topic"><h3>Topic 2: Electromagnetism</h3><div class="lesson"><div class="ll">6.1 Coulomb's Law and electric charge (incl. Cavendish/Coulomb history)</div><div class="meta2">Ch 6 &middot; pp 156-163, WE 6.1C</div></div><div class="lesson"><div class="ll">6.2 Electric fields, electric field strength and electrical potential energy</div><div class="meta2">Ch 6 &middot; pp 164-171, WE 6.2</div></div><div class="lesson"><div class="ll">6.3 Electric potential and equipotential lines; work done moving a charge in a field</div><div class="meta2">Ch 6 &middot; pp 172-181</div></div><div class="lesson"><div class="ll">7.1 Magnetic fields — origin, direction, field line diagrams</div><div class="meta2">Ch 7 &middot; pp 184-187</div></div><div class="lesson"><div class="ll">7.2 Magnetic fields around current-carrying wires; field strength</div><div class="meta2">Ch 7 &middot; pp 188-193, WE +3 more (OCR unclear)</div></div><div class="lesson"><div class="ll">7.3 Magnetic fields in solenoids</div><div class="meta2">Ch 7 &middot; pp 194-196</div></div><div class="lesson"><div class="ll">7.4 Force on a charged particle & on a current-carrying wire in a magnetic field</div><div class="meta2">Ch 7 &middot; pp 197-203, WE +2 more (OCR unclear)</div></div><div class="lesson"><div class="ll">7.5 Square Kilometre Array (SKA) — international collaboration extension</div><div class="meta2">Ch 7 &middot; pp 204-209</div></div><div class="lesson"><div class="ll">8.1 Magnetic flux and magnetic flux density</div><div class="meta2">Ch 8 &middot; pp 212-216</div></div><div class="lesson"><div class="ll">8.2 Electromagnetic induction — inducing EMF, Faraday's Law</div><div class="meta2">Ch 8 &middot; pp 217-221, WE 8.2A, 8.2B</div></div><div class="lesson"><div class="ll">8.3 Faraday's Law, Lenz's Law and conservation of energy</div><div class="meta2">Ch 8 &middot; pp 222-226</div></div><div class="lesson"><div class="ll">8.4 Transformers and electromagnetic induction problems</div><div class="meta2">Ch 8 &middot; pp 227-231</div></div><div class="lesson"><div class="ll">8.5 Electromagnetic waves — electric & magnetic field radiation</div><div class="meta2">Ch 8 &middot; pp 232-235</div></div><div class="lesson"><div class="ll">8.6 Electromagnetic phenomena risk/safety (wi-fi, mobile phones, MRI) — extension</div><div class="meta2">Ch 8 &middot; pp 236-243</div></div></div></div><div class="unit"><h2>Unit 4: Revolutions in modern physics</h2><div class="topic"><h3>Topic 1: Special relativity</h3><div class="lesson"><div class="ll">9.1 Frames of reference, inertial frames, postulates of special relativity</div><div class="meta2">Ch 9 &middot; pp 246-249</div></div><div class="lesson"><div class="ll">9.2 Motion relative to an observer; constant speed of light; simultaneity</div><div class="meta2">Ch 9 &middot; pp 250-254</div></div><div class="lesson"><div class="ll">9.3 Relativity of simultaneity (events, thought experiments)</div><div class="meta2">Ch 9 &middot; pp 255-258</div></div><div class="lesson"><div class="ll">9.4 Proper time, relativistic time interval, time dilation, mean lifetime of a particle</div><div class="meta2">Ch 9 &middot; pp 259-269, WE +2 more (OCR unclear)</div></div><div class="lesson"><div class="ll">10.1 Length contraction, proper length, relativistic length (space travel)</div><div class="meta2">Ch 10 &middot; pp 272-277, WE +1 more (OCR unclear)</div></div><div class="lesson"><div class="ll">10.2 Rest mass, relativistic momentum, mass-energy equivalence; speed limit of light</div><div class="meta2">Ch 10 &middot; pp 278-283, WE +3 more (OCR unclear)</div></div><div class="lesson"><div class="ll">10.3 Mass-energy equivalence — nuclear fission application</div><div class="meta2">Ch 10 &middot; pp 284-285</div></div><div class="lesson"><div class="ll">10.4 Paradoxes: twins paradox, ladder-in-barn, time travel</div><div class="meta2">Ch 10 &middot; pp 286-289</div></div><div class="lesson"><div class="ll">10.5 GPS & relativity application (extension)</div><div class="meta2">Ch 10 &middot; pp 290-295</div></div></div><div class="topic"><h3>Topic 2: Quantum theory</h3><div class="lesson"><div class="ll">11.1 Double-slit experiment & light as an electromagnetic wave</div><div class="meta2">Ch 11 &middot; pp 298-302, WE +1 more (OCR unclear)</div></div><div class="lesson"><div class="ll">11.2 Black-body radiation — evidence for quantisation</div><div class="meta2">Ch 11 &middot; pp 303-305, WE 11.2A</div></div><div class="lesson"><div class="ll">11.3 Black-body radiation & the greenhouse effect (extension: climate patterns)</div><div class="meta2">Ch 11 &middot; pp 306-307</div></div><div class="lesson"><div class="ll">11.4 Photons and the Planck equation</div><div class="meta2">Ch 11 &middot; pp 308-310, WE +1 more (OCR unclear)</div></div><div class="lesson"><div class="ll">11.5 The photoelectric effect, threshold frequency, work function</div><div class="meta2">Ch 11 &middot; pp 311-325, WE +2 more (OCR unclear)</div></div><div class="lesson"><div class="ll">12.1 Rutherford's model of the atom (1911 gold-foil experiment)</div><div class="meta2">Ch 12 &middot; pp 328-331</div></div><div class="lesson"><div class="ll">12.2 Bohr's model of the atom; light quanta and atomic energy states; line spectra</div><div class="meta2">Ch 12 &middot; pp 332-337, WE 12.2A, +1 more (OCR unclear)</div></div><div class="lesson"><div class="ll">12.3 Wave-particle duality of light</div><div class="meta2">Ch 12 &middot; pp 338-347, WE 12.3B, +1 more (OCR unclear)</div></div></div><div class="topic"><h3>Topic 3: The Standard Model</h3><div class="lesson"><div class="ll">13.1 Elementary particles & antiparticles; six quarks; baryons, mesons and leptons</div><div class="meta2">Ch 13 &middot; pp 350-355</div></div><div class="lesson"><div class="ll">13.2 The four fundamental forces and gauge bosons (strong, weak, EM)</div><div class="meta2">Ch 13 &middot; pp 356-361</div></div><div class="lesson"><div class="ll">13.3 Evidence supporting the Big Bang theory (cosmic background radiation, Hubble's Law) — extension</div><div class="meta2">Ch 13 &middot; pp 362-369</div></div><div class="lesson"><div class="ll">14.1 Lepton number and baryon number; conservation principles (solve problems)</div><div class="meta2">Ch 14 &middot; pp 372-378, WE 14.1A, 14.1B, 14.1C, 14.1D, 14.1F</div></div><div class="lesson"><div class="ll">14.2 Particle interaction (Feynman) diagrams: electron/electron, electron/positron, neutron decay</div><div class="meta2">Ch 14 &middot; pp 379-385</div></div><div class="lesson"><div class="ll">14.3 Symmetry in particle interactions</div><div class="meta2">Ch 14 &middot; pp 386-399, WE +2 more (OCR unclear)</div></div></div></div>
+<footer>Full-syllabus dot-point tracking, exam conditions and weekly reflection live on the <a href="https://mock-exam-tracker.vercel.app/">Tracker page</a>. Rebuilt subject reference &mdash; textbook/chapter/page and worked-example references, plus topic-linked video links where available.</footer>
+</div>
+</body>
+</html>
